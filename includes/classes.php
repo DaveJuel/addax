@@ -9,8 +9,7 @@ session_start();
 require 'rb.php';
 R::setup("mysql:host=localhost;dbname=beast", "root", "pesadev123");
 
-class UIfeeders
-{
+class UIfeeders {
 
     public $instance;
     public $field;
@@ -24,9 +23,8 @@ class UIfeeders
      * @param String $defValue The value to hold
      * @param String $defDisplay The value to display
      */
-    public function comboBuilder($content, $defValue, $defDisplay)
-    {       
-        echo "<option>-- Select ".strtolower(str_replace("_"," ",$defValue))."--</option>";
+    public function comboBuilder($content, $defValue, $defDisplay) {
+        echo "<option>-- Select " . strtolower(str_replace("_", " ", $defValue)) . "--</option>";
         for ($count = 0; $count < count($content); $count++) {
             $value = $content[$count][$defValue];
             $display = $content[$count][$defDisplay];
@@ -41,8 +39,7 @@ class UIfeeders
      * @param String $instance The instance to edit
      * @param String $field Description
      */
-    public function feedModal($instance, $subject)
-    {
+    public function feedModal($instance, $subject) {
         $this->instance = $instance;
         $this->field = $subject;
         $component = new main();
@@ -56,8 +53,7 @@ class UIfeeders
  * <p>This is the main method with all utilities used by the application.</p>
  * <p>It extends {@link UIfeeders The class that handles UI content}</p>
  */
-class main extends UIfeeders
-{
+class main extends UIfeeders {
 
     public $status;
     public $appName = "Addax";
@@ -69,8 +65,7 @@ class main extends UIfeeders
      * @param Integer $status The status of the message
      * @param String $text the message to be displayed on the screen
      */
-    public function feedbackFormat($status, $text)
-    {
+    public function feedbackFormat($status, $text) {
         $feedback = "";
         /*
          * status = 0 => failure
@@ -101,8 +96,7 @@ class main extends UIfeeders
      * @param Array $body Content of the table
      * @param Boolean $action Set to true to activate editing or delete
      */
-    public function displayTable($header, $body, $action)
-    {
+    public function displayTable($header, $body, $action) {
         /*
          * start table
          */
@@ -150,15 +144,14 @@ class main extends UIfeeders
      * <p>This method defines the action on each table item.</p>
      * @param Integer $rowId The  id of the item on the table ID
      */
-    private function tableAction($rowId)
-    {
+    private function tableAction($rowId) {
         echo "<td>" .
-            "<a class='btn btn-info' data-toggle='modal' data-target='#editModal' title='Edit' data-table_data='$rowId'>
+        "<a class='btn btn-info' data-toggle='modal' data-target='#editModal' title='Edit' data-table_data='$rowId'>
 		 <i class='fa fa-pencil fa-fw'></i>
 		</a>  " . "  <a class='open-DeleteItemDialog btn btn-danger' data-toggle='modal' data-target='#deleteModal' title='Remove'  data-table_data='$rowId'>
 		<i class='fa fa-remove fa-fw'></i>
 		</a>" .
-            "</td>";
+        "</td>";
     }
 
     /**
@@ -166,8 +159,7 @@ class main extends UIfeeders
      * <p>This is the method that generates links for the application.</p>
      * @param String $action This is the action assigned to the link.
      */
-    public function makeLinks($action)
-    {
+    public function makeLinks($action) {
         try {
             $subjects = R::getAll("SELECT id,title FROM subject ");
             if (count($subjects) > 0) {
@@ -186,8 +178,7 @@ class main extends UIfeeders
      * <h1>listCountries</h1>
      * <p>Generating the list of countries</p>
      */
-    public function listCountries()
-    {
+    public function listCountries() {
         $countries = array();
         $countries[] = array("code" => "AF", "name" => "Afghanistan", "d_code" => "+93");
         $countries[] = array("code" => "AL", "name" => "Albania", "d_code" => "+355");
@@ -431,8 +422,7 @@ class main extends UIfeeders
      * <p>This is the method to display the header of the page</p>
      * @param Int $subject The ID of the subject to refer to.
      */
-    public function header($subject)
-    {
+    public function header($subject) {
         $head = "";
         try {
             $subject = $subject;
@@ -454,22 +444,23 @@ class main extends UIfeeders
      * @param Integer $subjectId This the ID of the subject being viewed
      * @param String $caller The calling environment
      */
-    public function formBuilder($subjectId, $caller)
-    {
+    public function formBuilder($subjectId, $caller) {
 
         $title = "";
         try {
             $subjectId = $subjectId;
-            $subject = R::getAll("SELECT title,attr_number,attributes FROM subject WHERE id='$subjectId'");
+            $subject = R::getAll("SELECT title,attr_number FROM subject WHERE id='$subjectId'");
             if (count($subject) > 0) {
                 if (!$this->formInterface($subject, $subjectId, $caller)) {
                     $this->status = $this->feedbackFormat(0, "ERROR: form can not be built!");
+                    error_log("ERROR: -> CLASS:main FUNCTION:formBuilder ---- formInterface failure");
                 }
             } else {
                 $this->status = $this->feedbackFormat(0, "ERROR: form can not be built!");
+                error_log("ERROR: -> CLASS:main FUNCTION:formBuilder ---- no subject available");
             }
         } catch (Exception $e) {
-            error_log("MAIN[formBuilder]:" . $e);
+            error_log("ERROR: -> CLASS:main FUNCTION:formBuilder ---- ".$e);
         }
     }
 
@@ -477,21 +468,20 @@ class main extends UIfeeders
      * <h1>formInterface</h1>
      * making the form structure
      */
-    private function formInterface($subject, $subjectId, $caller)
-    {
+    private function formInterface($subject, $subjectId, $caller) {
         $built = false;
         $attrNumber = $subject[0]['attr_number'];
-        $attributes = explode(",", $subject[0]['attributes']);
+        $subjectObj=new subject();
+        $attributes = $subjectObj->getAttributes($subjectId);
         if ($attrNumber == count($attributes)) {
             echo "<form role='form' method='post' action='" . $_SERVER['PHP_SELF'] . "'>";
             echo "<div class='form-group'>";
             echo "<input type='hidden'  name='article' value='$subjectId'>";
             echo '';
             echo "</div>";
-            for ($counter = 0; $counter < $attrNumber; $counter++) {
-                $attrDetails = explode("=", $attributes[$counter]);
-                $attrName = $attrDetails[0];
-                $attrType = $attrDetails[1];
+            for ($counter = 0; $counter < count($attributes); $counter++) {
+                $attrName = $attributes[$counter]["name"];
+                $attrType = $attributes[$counter]["type"];
                 echo "<div class='form-group'>";
                 $this->inputGenerator($attrName, $attrType);
                 echo "</div>";
@@ -503,13 +493,14 @@ class main extends UIfeeders
                 echo "</div>";
             }
             echo "</form>";
+        }else{
+           error_log("ERROR: -> CLASS:main FUNCTION:formInterface ---- Attributes number not matching"); 
         }
         return $built;
     }
 
     //input generating function
-    private function inputGenerator($name, $type)
-    {
+    private function inputGenerator($name, $type) {
         if (isset($this->instance)) {
             $value = $this->getValue($name);
             $holder = "value";
@@ -544,8 +535,7 @@ class main extends UIfeeders
      * <h1>feedFormValues</h1>
      * <p>This method is to set values to feed the built form.</p>
      */
-    private function getValue($col)
-    {
+    private function getValue($col) {
         $value = "Not set";
         try {
             $instance = $this->instance;
@@ -558,16 +548,15 @@ class main extends UIfeeders
     }
 
     //BUILDING THE SELECT
-    public function fetchBuilder($table, $columnList)
-    {
+    public function fetchBuilder($table, $columnList) {
         $result = null;
         $query = "";
         //building the syntax
         for ($count = 0; $count < count($columnList); $count++) {
             if ($count == 0) {
-                $query = $columnList[$count];
+                $query = $columnList[$count]['name'];
             } else {
-                $query = $query . "," . $columnList[$count];
+                $query = $query . "," . $columnList[$count]['name'];
             }
         }
         $sql = "SELECT id," . $query . " FROM " . $table;
@@ -580,7 +569,7 @@ class main extends UIfeeders
                 $columns = array();
                 $columns[0] = $values[$count]['id'];
                 for ($inner = 1; $inner <= count($columnList); $inner++) { //feed column
-                    $columns[$inner] = $values[$count][$columnList[$inner - 1]];
+                    $columns[$inner] = $values[$count][$columnList[$inner - 1]['name']];
                 }
                 $rows[$count] = $columns;
             }
@@ -595,8 +584,7 @@ class main extends UIfeeders
     }
 
     //loading the list of tables
-    public function getTables()
-    {
+    public function getTables() {
         try {
             $tables = R::getAll("SELECT TABLE_NAME
                                 FROM INFORMATION_SCHEMA.TABLES
@@ -608,10 +596,9 @@ class main extends UIfeeders
     }
 
     /**
-     *This function returns the list of all columns belonging to the specified table.
+     * This function returns the list of all columns belonging to the specified table.
      */
-    public function getTableColumns($tableName)
-    {
+    public function getTableColumns($tableName) {
         try {
             $columns = R::getAll("SELECT COLUMN_NAME
             FROM INFORMATION_SCHEMA.COLUMNS
@@ -625,14 +612,12 @@ class main extends UIfeeders
 }
 
 //user object
-class user extends main
-{
+class user extends main {
 
     public $status = "";
 
     //getting the user
-    public function userList($type)
-    {
+    public function userList($type) {
         $header = array('No', 'Names', 'Email', 'Tel', 'Category');
         try {
             if (isset($type)) {
@@ -661,8 +646,7 @@ class user extends main
     }
 
     //add the user
-    public function add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type)
-    {
+    public function add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type) {
         if ($this->isValid($username)) {
             //saving user credentials
             try {
@@ -684,8 +668,7 @@ class user extends main
         }
     }
 
-    private function addCredentials($id, $username, $password, $type)
-    {
+    private function addCredentials($id, $username, $password, $type) {
         try {
             $user_credentials = R::dispense("credentials");
             $user_credentials->user = $id;
@@ -702,8 +685,7 @@ class user extends main
     }
 
     //validate username
-    private function isValid($username)
-    {
+    private function isValid($username) {
         $status = true;
         try {
             $check = R::getCol("SELECT id FROM credentials WHERE username='$username'");
@@ -718,8 +700,7 @@ class user extends main
     }
 
     //evaluating logged in user
-    private function evalLoggedUser($id, $u)
-    {
+    private function evalLoggedUser($id, $u) {
         //getting the logged in user information
         try {
             $logged_user = R::getRow("SELECT id FROM credentials WHERE user_id = {$id} AND username ='{$u}'  AND user_status='1' LIMIT 1");
@@ -732,8 +713,7 @@ class user extends main
     }
 
     //checking if user is logged in
-    public function checkLogin()
-    {
+    public function checkLogin() {
         $user_ok = false;
         $user_id = "";
         $log_usename = "";
@@ -758,8 +738,7 @@ class user extends main
     }
 
     //login user
-    public function login($username, $password)
-    {
+    public function login($username, $password) {
         $password = md5($password);
         try {
             $user = R::getRow("SELECT id,username,type FROM credentials WHERE username='$username' AND password='$password'");
@@ -775,7 +754,7 @@ class user extends main
                 try {
                     R::exec("UPDATE credentials SET last_login = now() WHERE id = '$db_id' LIMIT 1");
                 } catch (Exception $e) {
-
+                    
                 }
                 $this->status = $this->feedbackFormat(1, "Authentication verified");
                 header("location:../views/home.php");
@@ -793,14 +772,13 @@ class user extends main
  * THE SUBJECT CLASS
  * */
 
-class subject extends main
-{
+class subject extends main {
 
     public $status = "";
+    public $subjectId = null;
 
     //adding a new content
-    public function add($subjTitle, $subjAttrNumber, $subjAttributes, $subjAttrString, $subjCommenting, $subjLikes, $subjDisplayViews)
-    {
+    public function add($subjTitle, $subjAttrNumber, $subjAttributes, $subjCommenting, $subjLikes, $subjDisplayViews) {
 
         if (!$this->isValid($subjTitle) && $subjTitle != 'subject') {
             try {
@@ -810,15 +788,15 @@ class subject extends main
                 $subject->createdBy = $_SESSION['user_id'];
                 $subject->lastUpdate = date("d-m-Y h:m:s");
                 $subject->attrNumber = $subjAttrNumber;
-                $subject->attributes = $subjAttrString;
-                $subject->comments = $subjCommenting;
-                $subject->likes = $subjLikes;
-                $subject->displayViews = $subjDisplayViews;
-                $subjectId = R::store($subject);
-                //create the subject table
+                $subject->enable_commenting = $subjCommenting;
+                $subject->enable_liking = $subjLikes;
+                $subject->enable_display_views = $subjDisplayViews;
+                $this->subjectId = $subjectId = R::store($subject);
+                /*
+                 * Creating the attributes associated with the subject
+                 */
                 $article = new article();
-                $status = $article->register($subjTitle, $subjAttributes);
-                if ($status != true) {
+                if (!($article->register($subjTitle, $subjAttributes)) || !($this->createAttributes($subjAttributes))) {
                     try {
                         R::exec("DELETE FROM subject WHERE id='$subjectId'");
                     } catch (Exception $e) {
@@ -836,9 +814,34 @@ class subject extends main
         }
     }
 
+    /**
+     * Adding the subject attributes.
+     */
+    private function createAttributes($attributes) {
+        $isCreated = false;
+        if (isset($this->subjectId)) {
+            try {
+                for ($counter = 0; $counter < count($attributes); $counter++) {
+                    $attribute = R::dispense("attribute");
+                    $attribute->subject = $this->subjectId;
+                    $attribute->name = $attributes[$counter]["name"];
+                    $attribute->data_type = $attributes[$counter]["type"];
+                    $attribute->has_ref = $attributes[$counter]["has_ref"];
+                    $attribute->reference = $attributes[$counter]["reference"];
+                    $attributeId = R::store($attribute);
+                    if (isset($attributeId)) {
+                        $isCreated = true;
+                    }
+                }
+            } catch (Exception $exc) {
+                error_log("ERROR: subject(createAttributes)" . $exc);
+            }
+        }
+        return $isCreated;
+    }
+
     //checking the existence of a subject
-    private function isValid($title)
-    {
+    private function isValid($title) {
         $status = false;
         try {
             $check = R::getCol("SELECT id FROM subject WHERE title='$title'");
@@ -852,17 +855,17 @@ class subject extends main
         return $status;
     }
 
-    //returns the attributes of a given subject
-    public function getAttributes($subject)
-    {
+    /**
+     * returns the attributes of a given subject
+     */
+    public function getAttributes($subject) {
         $response = array();
         try {
-            $attributeList = R::getCell("SELECT attributes FROM subject WHERE id='$subject'");
-            $attributes = explode(",", $attributeList);
-            for ($counter = 0; $counter < count($attributes); $counter++) {
-                $attrDetails = explode("=", $attributes[$counter]);
-                $attrName = $attrDetails[0];
-                $response[$counter] = $attrName;
+            $attributeList = R::getAll("SELECT name,data_type FROM attribute WHERE subject='$subject'");
+            for ($counter = 0; $counter < count($attributeList); $counter++) {
+                $attrName = $attributeList[$counter]["name"];
+                $attrType = $attributeList[$counter]["data_type"];
+                $response[$counter] = array("name" => $attrName, "type" => $attrType);
             }
         } catch (Exception $e) {
             error_log("ERROR (getAttributes): " . $e);
@@ -871,8 +874,7 @@ class subject extends main
     }
 
     //GET LIST OF REGISTERED SUBJECTS
-    public function getList()
-    {
+    public function getList() {
         $header = array("Title", "Created by", "Created on", "Last update");
         $tablecontent = null;
         try {
@@ -896,14 +898,12 @@ class subject extends main
  * THE ARTICLE CLASS
  *  */
 
-class article extends main
-{
+class article extends main {
 
     public $status = "";
 
     //register a new article
-    public function register($subjectTitle, $attributes)
-    {
+    public function register($subjectTitle, $attributes) {
         $status = false;
         try {
             $article = R::dispense($subjectTitle);
@@ -928,18 +928,17 @@ class article extends main
             }
             $status = true;
         } catch (Exception $e) {
-
+            
         }
         return $status;
     }
 
     //adding a new article content
-    public function add($content, $values, $attributes)
-    {
+    public function add($content, $values, $attributes) {
         try {
             $article = R::dispense($content);
             for ($counter = 0; $counter < count($attributes); $counter++) {
-                $attribute = $attributes[$counter];
+                $attribute = $attributes[$counter]['name'];
                 $value = $values[$counter];
                 $article->$attribute = $value;
             }
@@ -957,27 +956,30 @@ class article extends main
     }
 
     //DISPLAYING THE LIST OF ARTICLES
-    public function getList($subjectId)
-    {
+    public function getList($subjectId) {
         //initializing the function
         $subjectObj = new subject();
         $articleTitle = $this->header($subjectId);
         $attributes = $subjectObj->getAttributes($subjectId);
         $list = $this->fetchBuilder($articleTitle, $attributes);
         //displaying the table
-        $this->displayTable($attributes, $list, null);
+        $attrNameList=array();
+        for($counter=0;$counter<count($attributes);$counter++){
+            $attrNameList[$counter]=$attributes[$counter]['name'];
+        }
+        if(count($attrNameList)>0){
+            $this->displayTable($attrNameList, $list, null);
+        }        
     }
 
     //editting an article
-    public function edit()
-    {
-
+    public function edit() {
+        
     }
 
     //adding a comment
-    public function comment()
-    {
-
+    public function comment() {
+        
     }
 
 }

@@ -53,18 +53,17 @@ switch ($action) {
                 $attrName = $_REQUEST['attr_name' . $count];
                 $attrType = $_REQUEST['attr_type' . $count];
                 $attrNullable = $_REQUEST['attr_nullable' . $count];
-                $attribute_desc = array('name' => $attrName, 'type' => $attrType, 'nullable' => $attrNullable);
-                if ($count == 0) {
-                    $attrString = $attrName . "=" . $attrType;
-                } else {
-                    $attrString = $attrString . "," . $attrName . "=" . $attrType;
-                }
+                $attribute_desc = array(
+                    'name' => $attrName,
+                    'type' => $attrType, 
+                    'has_ref' =>false,
+                    'reference'=>NULL);            
                 array_push($attributes, $attribute_desc);
             }
             $commenting = $_REQUEST['subject_commenting'];
             $likes = $_REQUEST['subject_likes'];
             $displayViews = $_REQUEST['subject_display_views'];
-            $subject->add($title, $attrNumber, $attributes, $attrString, $commenting, $likes, $displayViews);
+            $subject->add($title, $attrNumber, $attributes, $commenting, $likes, $displayViews);
         } else {
             $subject->status = $subject->feedbackFormat(0, "Fill all required fields!");
         }
@@ -76,7 +75,7 @@ switch ($action) {
         if (count($attributes) > 0) {
             //getting form values
             for ($count = 0; $count < count($attributes); $count++) {
-                $values[$count] = $_REQUEST[$attributes[$count]];
+                $values[$count] = $_REQUEST[$attributes[$count]['name']];
             }
             //saving form data
             $main->status = $article->add($main->header($articleId), $values, $attributes);
