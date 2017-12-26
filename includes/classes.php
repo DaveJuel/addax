@@ -24,7 +24,9 @@ class UIfeeders {
      * @param String $defDisplay The value to display
      */
     public function comboBuilder($content, $defValue, $defDisplay) {
-        echo "<option>-- Select " . strtolower(str_replace("_", " ", $defValue)) . "--</option>";
+        if (count($content) > 1) {
+            echo "<option>-- Select " . strtolower(str_replace("_", " ", $defValue)) . "--</option>";
+        }
         for ($count = 0; $count < count($content); $count++) {
             $value = $content[$count][$defValue];
             $display = $content[$count][$defDisplay];
@@ -44,6 +46,74 @@ class UIfeeders {
         $this->field = $subject;
         $component = new main();
         $component->formBuilder($subject, "update");
+    }
+
+    /**
+     * <h1>isDataTypeTable</h1>
+     * <p>Verifies if datatype is table</p> 
+     * @param String $dataType The data type to be verified
+     */
+    public function isDataTypeTable($dataType) {
+        $isTable = false;
+        if (isset($dataType)) {
+            try {
+                $tableList = R::getAll("SELECT TABLE_NAME
+                                FROM INFORMATION_SCHEMA.TABLES
+                                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='beast'");
+                if (count($tableList) > 0) {
+                    for ($count = 0; $count < count($tableList); $count++) {
+                        if ($tableList[$count]['TABLE_NAME'] == $dataType) {
+                            $isTable = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception $exc) {
+                error_log("ERROR(UIFeeders:isDataTypeTable)");
+            }
+        }
+        return $isTable;
+    }
+
+    /**
+     * <h1>isDataTypeColumn</h1>
+     * <p>Verifies if datatype is column</p>
+     * @param String $dataType the data type to be verified
+     */
+    public function isDataTypeColumn($dataType) {
+        $isColumn = false;
+        if (isset($dataType)) {
+            try {
+                $columnList = R::getAll("SELECT COLUMN_NAME
+                                      FROM INFORMATION_SCHEMA.COLUMNS");
+                if (count($columnList) > 0) {
+                    for ($count = 0; $count < count($columnList); $count++) {
+                        if ($columnList[$count]['COLUMN_NAME'] == $dataType) {
+                            $isColumn = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception $exc) {
+                error_log("ERROR(UIFeeders:isDataTypeTable)" . $exc);
+            }
+        }
+        return $isColumn;
+    }
+
+    /**
+     * <h1>isDataTypeDefault</h1>
+     * <p>Verifies if data type is valid</p>
+     * @param String $dataType the data type to be verified
+     */
+    public function isDataTypeDefault($dataType) {
+        $isDefault = false;
+        $dataType= strtolower($dataType);
+        if (isset($dataType) &&
+                ($dataType == "text"||$dataType == "numeric" || $dataType == "date") || $dataType == "file" || $dataType == "long text") {
+           $isDefault=true; 
+        }
+        return $isDefault;
     }
 
 }
@@ -460,7 +530,7 @@ class main extends UIfeeders {
                 error_log("ERROR: -> CLASS:main FUNCTION:formBuilder ---- no subject available");
             }
         } catch (Exception $e) {
-            error_log("ERROR: -> CLASS:main FUNCTION:formBuilder ---- ".$e);
+            error_log("ERROR: -> CLASS:main FUNCTION:formBuilder ---- " . $e);
         }
     }
 
@@ -471,7 +541,7 @@ class main extends UIfeeders {
     private function formInterface($subject, $subjectId, $caller) {
         $built = false;
         $attrNumber = $subject[0]['attr_number'];
-        $subjectObj=new subject();
+        $subjectObj = new subject();
         $attributes = $subjectObj->getAttributes($subjectId);
         if ($attrNumber == count($attributes)) {
             echo "<form role='form' method='post' action='" . $_SERVER['PHP_SELF'] . "'>";
@@ -493,8 +563,8 @@ class main extends UIfeeders {
                 echo "</div>";
             }
             echo "</form>";
-        }else{
-           error_log("ERROR: -> CLASS:main FUNCTION:formInterface ---- Attributes number not matching"); 
+        } else {
+            error_log("ERROR: -> CLASS:main FUNCTION:formInterface ---- Attributes number not matching");
         }
         return $built;
     }
@@ -596,14 +666,37 @@ class main extends UIfeeders {
     }
 
     /**
+     * <h1>getTableColumns</h1>
+     * <p>
      * This function returns the list of all columns belonging to the specified table.
+     * </p> 
+     * @param String $tableName The name of the table to be specified
      */
     public function getTableColumns($tableName) {
+        $columnList = null;
         try {
-            $columns = R::getAll("SELECT COLUMN_NAME
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME='$tableName'");
-            $this->comboBuilder($columns, "COLUMN_NAME", "COLUMN_NAME");
+            if (!$this->isDataTypeTable($tableName) && isset($_SESSION['ref_data_type']) && !$this->isDataTypeColumn($tableName)) {
+                $tableName = $_SESSION['ref_data_type'];
+            } else if (isset($tableName) && ($this->isDataTypeTable($tableName) && !$this->isDataTypeColumn($tableName))) {
+                $_SESSION['ref_data_type'] = $tableName;
+            } else if (isset($tableName) && (!$this->isDataTypeTable($tableName) && $this->isDataTypeColumn($tableName))) {
+                $_SESSION['ref_data_value'] = $columnName = $tableName;
+            }
+            if (isset($columnName) && $this->isDataTypeColumn($columnName) && isset($_SESSION['ref_data_type'])) {
+                $columns = R::getAll("SELECT DISTINCT COLUMN_NAME
+                                      FROM INFORMATION_SCHEMA.COLUMNS
+                                      WHERE COLUMN_NAME='$columnName'");
+                $columnList[0] = array("COLUMN_NAME" => $_SESSION['ref_data_type']."|".$columns[0]['COLUMN_NAME'], "COLUMN_TYPE" => $_SESSION['ref_data_type'] . " " . $columns[0]['COLUMN_NAME']);
+            } else {
+                $_SESSION['ref_data_type'] = $tableName;
+                $columns = R::getAll("SELECT COLUMN_NAME 
+                                      FROM INFORMATION_SCHEMA.COLUMNS
+                                      WHERE TABLE_NAME='$tableName'");
+                for ($counter = 0; $counter < count($columns); $counter++) {
+                    $columnList[$counter] = array("COLUMN_NAME" => $columns[$counter]['COLUMN_NAME'], "COLUMN_TYPE" => $_SESSION['ref_data_type'] . " " . $columns[$counter]['COLUMN_NAME']);
+                }
+            }            
+            $this->comboBuilder($columnList, "COLUMN_NAME", "COLUMN_TYPE");
         } catch (Exception $exc) {
             error_log("ERROR(main:getTableColumns)" . $exc);
         }
@@ -826,15 +919,38 @@ class subject extends main {
                     $attribute->subject = $this->subjectId;
                     $attribute->name = $attributes[$counter]["name"];
                     $attribute->data_type = $attributes[$counter]["type"];
-                    $attribute->has_ref = $attributes[$counter]["has_ref"];
-                    $attribute->reference = $attributes[$counter]["reference"];
+                    $attribute->has_ref = $hasRef = $attributes[$counter]["has_ref"];
                     $attributeId = R::store($attribute);
-                    if (isset($attributeId)) {
+                    if ((isset($attributeId) && $hasRef == false) || (isset($attributeId) && $hasRef == true && $this->createReference($attributeId, $attributes[$counter]["reference"]))) {
                         $isCreated = true;
                     }
                 }
             } catch (Exception $exc) {
                 error_log("ERROR: subject(createAttributes)" . $exc);
+            }
+        }
+        return $isCreated;
+    }
+
+    /**
+     * <h1>createReference</h1>
+     * <p>Adding references to attributes</p> 
+     * @param Integer $attributeId The ID of the attribute creating the reference
+     * @param String $referenceName The name of reference
+     */
+    public function createReference($attributeId, $referenceName) {
+        $isCreated = false;
+        if (isset($attributeId)) {
+            try {
+                $reference = R::dispense("reference");
+                $reference->attribute = $attributeId;
+                $reference->name = $referenceName;
+                $referenceId = R::store($reference);
+                if (isset($referenceId)) {
+                    $isCreated = true;
+                }
+            } catch (Exception $e) {
+                error_log("ERROR: subject(createReference)" . $e);
             }
         }
         return $isCreated;
@@ -884,7 +1000,7 @@ class subject extends main {
                 $createdBy = $subjectList[$count]['email'];
                 $createdOn = $subjectList[$count]['created_on'];
                 $lastUpdate = $subjectList[$count]['last_update'];
-                $tablecontent[$count] = array($title, $createdBy, $createdOn, $lastUpdate);
+                $tablecontent[$count] = array(1 => $title, 2 => $createdBy, 3 => $createdOn, 4 => $lastUpdate);
             }
             $this->displayTable($header, $tablecontent, null);
         } catch (Exception $e) {
@@ -894,10 +1010,9 @@ class subject extends main {
 
 }
 
-/*
+/**
  * THE ARTICLE CLASS
- *  */
-
+ */
 class article extends main {
 
     public $status = "";
@@ -908,7 +1023,7 @@ class article extends main {
         try {
             $article = R::dispense($subjectTitle);
             for ($counter = 0; $counter < count($attributes); $counter++) {
-                $attribute = $attributes[$counter]['name'];
+                $attribute = str_replace(" ","_", $attributes[$counter]['name']);
                 if ($attributes[$counter]['type'] == 'text') {
                     $article->$attribute = "dummy text";
                 } else if ($attributes[$counter]['type'] == 'numeric') {
@@ -924,11 +1039,12 @@ class article extends main {
             try {
                 R::exec("DELETE FROM " . $subjectTitle . " WHERE id='$articleId'");
             } catch (Exception $e) {
+                error_log("ERROR(article:Register): " . $e);
                 $this->status = $this->feedbackFormat(0, "ERROR(Register): " . $e);
             }
             $status = true;
         } catch (Exception $e) {
-            
+            error_log("ERROR(article:Register): " . $e);
         }
         return $status;
     }
@@ -955,21 +1071,32 @@ class article extends main {
         return $response;
     }
 
-    //DISPLAYING THE LIST OF ARTICLES
+    /**
+     * <h1>getList</h1>
+     * <p>This function is to return the list of articles in table view.</p>
+     * @param Integer $subjectId The ID of the subject in consideration.
+     */
     public function getList($subjectId) {
-        //initializing the function
+        /*
+         * initializing the function
+         */
         $subjectObj = new subject();
         $articleTitle = $this->header($subjectId);
         $attributes = $subjectObj->getAttributes($subjectId);
         $list = $this->fetchBuilder($articleTitle, $attributes);
-        //displaying the table
-        $attrNameList=array();
-        for($counter=0;$counter<count($attributes);$counter++){
-            $attrNameList[$counter]=$attributes[$counter]['name'];
+        /*
+         * Preparing values to display in the table
+         */
+        $attrNameList = array();
+        for ($counter = 0; $counter < count($attributes); $counter++) {
+            $attrNameList[$counter] = $attributes[$counter]['name'];
         }
-        if(count($attrNameList)>0){
+        /*
+         * Displaying the table
+         */
+        if (count($attrNameList) > 0) {
             $this->displayTable($attrNameList, $list, null);
-        }        
+        }
     }
 
     //editting an article

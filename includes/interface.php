@@ -53,11 +53,29 @@ switch ($action) {
                 $attrName = $_REQUEST['attr_name' . $count];
                 $attrType = $_REQUEST['attr_type' . $count];
                 $attrNullable = $_REQUEST['attr_nullable' . $count];
-                $attribute_desc = array(
-                    'name' => $attrName,
-                    'type' => $attrType, 
-                    'has_ref' =>false,
-                    'reference'=>NULL);            
+                $attribute_desc = null;
+                if ($subject->isDataTypeDefault($attrType)) {
+                    $attribute_desc = array(
+                        'name' => $attrName,
+                        'type' => $attrType,
+                        'has_ref' => false,
+                        'reference' => NULL);
+                } else if (!$subject->isDataTypeDefault($attrType) && !$subject->isDataTypeTable($attrType)) {
+                    $attrDetails = explode("|", $attrType);
+                    if (isset($attrDetails[0]) && isset($attrDetails[1]) && $subject->isDataTypeTable($attrDetails[0]) && $subject->isDataTypeColumn($attrDetails[1])) {
+                        $attribute_desc = array(
+                            'name' => $attrName,
+                            'type' => $attrDetails[0],
+                            'has_ref' => true,
+                            'reference' => $attrDetails[1]);
+                    } else {
+                        $subject->status = $subject->feedbackFormat(0, "ERROR: Failure to read data types");
+                        return;
+                    }
+                } else {
+                    $subject->status = $subject->feedbackFormat(0, "ERROR: Invalid data types");
+                    return;
+                }
                 array_push($attributes, $attribute_desc);
             }
             $commenting = $_REQUEST['subject_commenting'];
@@ -90,6 +108,11 @@ switch ($action) {
     case 'combo_table_columns':
         if (isset($_REQUEST["table_name"])) {
             $main->getTableColumns($_REQUEST["table_name"]);
+        }
+        break;
+    case 'is_data_type_table':
+        if (isset($_REQUEST['data_type'])) {
+            echo $main->isDataTypeTable($_REQUEST['data_type']);
         }
         break;
     case 'feed_modal':

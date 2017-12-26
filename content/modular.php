@@ -8,7 +8,7 @@
             </div>
             <div class="modal-body">                
                 <input type="hidden" id="instance_value" name="table_data" value="">
-                <input type="hidden" id="field_value" value="<?php echo $_REQUEST['article'] ?>">               
+                <input type="hidden" id="field_value" value="<?php if(isset($_REQUEST['article'])) echo $_REQUEST['article']; ?>">               
                 <?php
                 if (isset($_REQUEST['article'])) {
                     //form building                         

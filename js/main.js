@@ -42,12 +42,12 @@ function addAttribute(obj) {
         attrType.name = "attr_type" + i;
         attrType.onchange = "loadComboBox(this)";
         attrType.innerHTML = "<option value=''>-- Select type --</option>" +
-            "<option value='text'>Text</option>" +
-            "<option value='numeric'>Numeric</option>" +
-            "<option value='date'>Date</option>" +
-            "<option value='file'>File</option>" +
-            "<option value='long text'>Long text</option>" +
-            "<option value='select'>Select from</option>";
+                "<option value='text'>Text</option>" +
+                "<option value='numeric'>Numeric</option>" +
+                "<option value='date'>Date</option>" +
+                "<option value='file'>File</option>" +
+                "<option value='long text'>Long text</option>" +
+                "<option value='select'>Select from</option>";
         attrType.className = "form-control";
         attrType.style = "margin-left:15px;margin-bottom:2px";
         attrType.setAttribute("onchange", "loadComboBox(this)");
@@ -79,11 +79,14 @@ function addAttribute(obj) {
 }
 
 
-//load combo box
+/**
+ * load combo box
+ */
 function loadComboBox(obj) {
-    var xmlhttp = new XMLHttpRequest;
+    var xmlhttp = null;
     var response = null;
     if (obj.value == "select") {
+        xmlhttp = new XMLHttpRequest;
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.status == 200 && xmlhttp.readyState == 4) {
                 response = xmlhttp.responseText;
@@ -92,13 +95,8 @@ function loadComboBox(obj) {
         };
         xmlhttp.open("GET", "../includes/interface.php?action=combo_tables", true);
         xmlhttp.send();
-    } else if (obj.value != "text" &&
-        obj.value != "numeric" &&
-        obj.value != "date" &&
-        obj.value != "file" &&
-        obj.value != "long text" &&
-        obj.value != "select" &&
-        obj.value != "none") {
+    } else if (isDataTypeTable(obj.value) == true) {
+        xmlhttp = new XMLHttpRequest;
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.status == 200 && xmlhttp.readyState == 4) {
                 response = xmlhttp.responseText;
@@ -109,13 +107,27 @@ function loadComboBox(obj) {
         xmlhttp.send();
     } else if (obj.value == "none") {
         obj.innerHTML = "<option value=''>-- Select type --</option>" +
-            "<option value='text'>Text</option>" +
-            "<option value='numeric'>Numeric</option>" +
-            "<option value='date'>Date</option>" +
-            "<option value='file'>File</option>" +
-            "<option value='long text'>Long text</option>" +
-            "<option value='select'>Select from</option>";
+                "<option value='text'>Text</option>" +
+                "<option value='numeric'>Numeric</option>" +
+                "<option value='date'>Date</option>" +
+                "<option value='file'>File</option>" +
+                "<option value='long text'>Long text</option>" +
+                "<option value='select'>Select from</option>";
     }
+}
+
+function isDataTypeTable(dataType) {
+    var isTable = false;
+    if ((dataType != null) && (dataType != "text" &&
+            dataType != "numeric" &&
+            dataType != "date" &&
+            dataType != "file" &&
+            dataType != "long text" &&
+            dataType != "select" &&
+            dataType != "none")) {
+        isTable = true;
+    }
+    return isTable;
 }
 //feed combo box
 function feedComboBox() {
