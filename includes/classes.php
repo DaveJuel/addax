@@ -6,8 +6,7 @@ session_start();
  * Created by: David NIWEWE
  *
  */
-require 'rb.php';
-R::setup("mysql:host=localhost;dbname=beast", "root", "pesadev123");
+require 'rb.php';R::setup("mysql:host=localhost;dbname=reminder", "root", "pesadev123");
 
 class UIfeeders {
 
@@ -55,11 +54,13 @@ class UIfeeders {
      */
     public function isDataTypeTable($dataType) {
         $isTable = false;
+        $mainObj=new main();
+        $schema=$mainObj->dbname;
         if (isset($dataType)) {
             try {
                 $tableList = R::getAll("SELECT TABLE_NAME
                                 FROM INFORMATION_SCHEMA.TABLES
-                                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='beast'");
+                                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='$schema'");
                 if (count($tableList) > 0) {
                     for ($count = 0; $count < count($tableList); $count++) {
                         if ($tableList[$count]['TABLE_NAME'] == $dataType) {
@@ -108,10 +109,10 @@ class UIfeeders {
      */
     public function isDataTypeDefault($dataType) {
         $isDefault = false;
-        $dataType= strtolower($dataType);
+        $dataType = strtolower($dataType);
         if (isset($dataType) &&
-                ($dataType == "text"||$dataType == "numeric" || $dataType == "date") || $dataType == "file" || $dataType == "long text") {
-           $isDefault=true; 
+                ($dataType == "text" || $dataType == "numeric" || $dataType == "date") || $dataType == "file" || $dataType == "long text") {
+            $isDefault = true;
         }
         return $isDefault;
     }
@@ -128,6 +129,7 @@ class main extends UIfeeders {
     public $status;
     public $appName = "Addax";
     public $author = "David NIWEWE";
+    public $dbname="reminder";
 
     /**
      * <h1>feedbackFormat</h1>
@@ -553,7 +555,7 @@ class main extends UIfeeders {
                 $attrName = $attributes[$counter]["name"];
                 $attrType = $attributes[$counter]["type"];
                 echo "<div class='form-group'>";
-                $this->inputGenerator($attrName, $attrType);
+                $this->inputGenerator($attributes[$counter]["id"], $attrName, $attrType);
                 echo "</div>";
                 $built = true;
             }
@@ -569,8 +571,12 @@ class main extends UIfeeders {
         return $built;
     }
 
-    //input generating function
-    private function inputGenerator($name, $type) {
+   /**
+     * <h1>inputGenerator</h1>
+     * <p>Generates the input for attributes with default datatypes</p>
+     * @param String $name The name of the attribute
+     */
+    private function inputGenerator($id, $name, $type) {
         if (isset($this->instance)) {
             $value = $this->getValue($name);
             $holder = "value";
@@ -578,27 +584,58 @@ class main extends UIfeeders {
             $value = "Insert value...";
             $holder = "placeholder";
         }
-        $title = "<span class='input-group-addon'>" . $name . "</span>";
+        $title = "<span class='input-group-addon'>" .str_replace("_", " ", $name). "</span>";
         $input = "";
-        switch ($type) {
-            case 'text':
-                $input = "<input type='text' name='$name' class='form-control' $holder='$value'>";
-                break;
-            case 'numeric':
-                $input = "<input type='number' name='$name' class='form-control' $holder='$value'>";
-                break;
-            case 'date':
-                $input = "<input type='date' name='$name' class='form-control'$holder='$value'>";
-                break;
-            case 'file':
-                $input = "<input type='file' name='$name' class='form-control'$holder='$value'>";
-                break;
-            case 'long text':
-                $input = "<textarea class='form-control' name='$name'>$value</textarea>";
-                break;
+        if ($this->isDataTypeDefault($type)) {
+            switch ($type) {
+                case 'text':
+                    $input = "<input type='text' name='$name' class='form-control' $holder='$value'>";
+                    break;
+                case 'numeric':
+                    $input = "<input type='number' name='$name' class='form-control' $holder='$value'>";
+                    break;
+                case 'date':
+                    $input = "<input type='date' name='$name' class='form-control'$holder='$value'>";
+                    break;
+                case 'file':
+                    $input = "<input type='file' name='$name' class='form-control'$holder='$value'>";
+                    break;
+                case 'long text':
+                    $input = "<textarea class='form-control' name='$name'>$value</textarea>";
+                    break;
+            }
+        } else {
+            $input = $this->referentialDataInputGenerator($id, $name, $type);
         }
         $formInput = $title . $input;
         echo "<div class='input-group'>" . $formInput . "</div>";
+    }
+
+    private function referentialDataInputGenerator($id, $name, $type) {
+        $input = "";
+        if (isset($id) && isset($name) && isset($type)) {
+            $startCombo = "<select type='date' name='$name' class='form-control'>";
+            $subjectObj = new subject();
+            $reference = $subjectObj->readReference($id);
+            if (isset($reference) && $subjectObj->isDataTypeTable($type)) {
+                try {
+                    $referenceValues = R::getCol("SELECT " . $reference . " FROM " . $type);
+                    if(count($referenceValues)>0){
+                        $optionString = "<option >Select $reference</option>";
+                    }else{
+                        $optionString = "";
+                    }
+                    for ($counter = 0; $counter < count($referenceValues); $counter++) {
+                        $optionString=$optionString."<option value=".$referenceValues[$counter].">".$referenceValues[$counter]."</option>";
+                    }
+                } catch (Exception $exc) {
+                    error_log("ERROR(referentialDataInputGenerator):" . $e);
+                }
+            }
+            $endCombo = "</select>";
+            $input=$startCombo.$optionString.$endCombo;
+        }
+        return $input;
     }
 
     /**
@@ -624,9 +661,9 @@ class main extends UIfeeders {
         //building the syntax
         for ($count = 0; $count < count($columnList); $count++) {
             if ($count == 0) {
-                $query = $columnList[$count]['name'];
+                $query = str_replace(" ", "_", $columnList[$count]['name']);
             } else {
-                $query = $query . "," . $columnList[$count]['name'];
+                $query = $query . "," . str_replace(" ", "_", $columnList[$count]['name']);
             }
         }
         $sql = "SELECT id," . $query . " FROM " . $table;
@@ -639,7 +676,7 @@ class main extends UIfeeders {
                 $columns = array();
                 $columns[0] = $values[$count]['id'];
                 for ($inner = 1; $inner <= count($columnList); $inner++) { //feed column
-                    $columns[$inner] = $values[$count][$columnList[$inner - 1]['name']];
+                    $columns[$inner] = $values[$count][str_replace(" ", "_", $columnList[$inner-1]['name'])];
                 }
                 $rows[$count] = $columns;
             }
@@ -655,10 +692,11 @@ class main extends UIfeeders {
 
     //loading the list of tables
     public function getTables() {
+        $schema= $this->dbname;
         try {
             $tables = R::getAll("SELECT TABLE_NAME
                                 FROM INFORMATION_SCHEMA.TABLES
-                                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='beast'");
+                                WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='$schema'");
             $this->comboBuilder($tables, "TABLE_NAME", "TABLE_NAME");
         } catch (Exception $e) {
             error_log("ERROR(main:getTables)" . $e);
@@ -686,7 +724,7 @@ class main extends UIfeeders {
                 $columns = R::getAll("SELECT DISTINCT COLUMN_NAME
                                       FROM INFORMATION_SCHEMA.COLUMNS
                                       WHERE COLUMN_NAME='$columnName'");
-                $columnList[0] = array("COLUMN_NAME" => $_SESSION['ref_data_type']."|".$columns[0]['COLUMN_NAME'], "COLUMN_TYPE" => $_SESSION['ref_data_type'] . " " . $columns[0]['COLUMN_NAME']);
+                $columnList[0] = array("COLUMN_NAME" => $_SESSION['ref_data_type'] . "|" . $columns[0]['COLUMN_NAME'], "COLUMN_TYPE" => $_SESSION['ref_data_type'] . " " . $columns[0]['COLUMN_NAME']);
             } else {
                 $_SESSION['ref_data_type'] = $tableName;
                 $columns = R::getAll("SELECT COLUMN_NAME 
@@ -695,7 +733,7 @@ class main extends UIfeeders {
                 for ($counter = 0; $counter < count($columns); $counter++) {
                     $columnList[$counter] = array("COLUMN_NAME" => $columns[$counter]['COLUMN_NAME'], "COLUMN_TYPE" => $_SESSION['ref_data_type'] . " " . $columns[$counter]['COLUMN_NAME']);
                 }
-            }            
+            }
             $this->comboBuilder($columnList, "COLUMN_NAME", "COLUMN_TYPE");
         } catch (Exception $exc) {
             error_log("ERROR(main:getTableColumns)" . $exc);
@@ -956,6 +994,23 @@ class subject extends main {
         return $isCreated;
     }
 
+    /**
+     * <h1>readReference</h1>
+     * <p>This method is to read the references of the specified attributes</p>
+     * @param Integer $attrId The id of the attribute.
+     */
+    public function readReference($attrId) {
+        $reference = null;
+        if (isset($attrId)) {
+            try {
+                $reference = R::getCell("SELECT DISTINCT name FROM reference WHERE attribute='$attrId'");
+            } catch (Exception $exc) {
+                error_log("ERROR: subject(readReference)" . $exc);
+            }
+        }
+        return $reference;
+    }
+
     //checking the existence of a subject
     private function isValid($title) {
         $status = false;
@@ -977,11 +1032,11 @@ class subject extends main {
     public function getAttributes($subject) {
         $response = array();
         try {
-            $attributeList = R::getAll("SELECT name,data_type FROM attribute WHERE subject='$subject'");
+            $attributeList = R::getAll("SELECT id,name,data_type FROM attribute WHERE subject='$subject'");
             for ($counter = 0; $counter < count($attributeList); $counter++) {
-                $attrName = $attributeList[$counter]["name"];
+                $attrName = str_replace(" ", "_", $attributeList[$counter]["name"]);
                 $attrType = $attributeList[$counter]["data_type"];
-                $response[$counter] = array("name" => $attrName, "type" => $attrType);
+                $response[$counter] = array("id" => $attributeList[$counter]["id"], "name" => $attrName, "type" => $attrType);
             }
         } catch (Exception $e) {
             error_log("ERROR (getAttributes): " . $e);
@@ -994,10 +1049,10 @@ class subject extends main {
         $header = array("Title", "Created by", "Created on", "Last update");
         $tablecontent = null;
         try {
-            $subjectList = R::getAll("SELECT * FROM subjectDetails ORDER BY created_on DESC ");
+            $subjectList = R::getAll("SELECT title,created_by,created_on,last_update FROM subject ORDER BY created_on DESC ");
             for ($count = 0; $count < count($subjectList); $count++) {
                 $title = $subjectList[$count]['title'];
-                $createdBy = $subjectList[$count]['email'];
+                $createdBy = $subjectList[$count]['created_by'];
                 $createdOn = $subjectList[$count]['created_on'];
                 $lastUpdate = $subjectList[$count]['last_update'];
                 $tablecontent[$count] = array(1 => $title, 2 => $createdBy, 3 => $createdOn, 4 => $lastUpdate);
@@ -1023,7 +1078,7 @@ class article extends main {
         try {
             $article = R::dispense($subjectTitle);
             for ($counter = 0; $counter < count($attributes); $counter++) {
-                $attribute = str_replace(" ","_", $attributes[$counter]['name']);
+                $attribute = str_replace(" ", "_", $attributes[$counter]['name']);
                 if ($attributes[$counter]['type'] == 'text') {
                     $article->$attribute = "dummy text";
                 } else if ($attributes[$counter]['type'] == 'numeric') {
@@ -1054,7 +1109,7 @@ class article extends main {
         try {
             $article = R::dispense($content);
             for ($counter = 0; $counter < count($attributes); $counter++) {
-                $attribute = $attributes[$counter]['name'];
+                $attribute = str_replace(" ", "_", $attributes[$counter]['name']);
                 $value = $values[$counter];
                 $article->$attribute = $value;
             }
