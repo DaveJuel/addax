@@ -6,7 +6,7 @@ session_start();
  * Created by: David NIWEWE
  *
  */
-require 'rb.php';R::setup("mysql:host=localhost;dbname=reminder", "root", "pesadev123");
+require 'rb.php';R::setup("mysql:host=localhost;dbname=beast", "root", "pesadev123");
 
 class UIfeeders {
 
@@ -129,7 +129,7 @@ class main extends UIfeeders {
     public $status;
     public $appName = "Addax";
     public $author = "David NIWEWE";
-    public $dbname="reminder";
+    public $dbname="beast";
 
     /**
      * <h1>feedbackFormat</h1>
