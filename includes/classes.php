@@ -6,7 +6,11 @@ session_start();
  * Created by: David NIWEWE
  *
  */
-require 'rb.php';R::setup("mysql:host=localhost;dbname=beast", "root", "pesadev123");
+
+/*
+ * TODO: You need to replace username and password by your specific db credentials
+ */
+require 'rb.php';R::setup("mysql:host=localhost;dbname=addax", "username", "password");
 
 class UIfeeders {
 
