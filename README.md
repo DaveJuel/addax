@@ -1,22 +1,23 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+This file is to instruct you installing and successfully running Addax.
 
 ### What is this repository for? ###
 
-* Quick summary
-* Version
+* Addax is a web content management application. It web based.
+* Version 1.0.0 beta
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
-### How do I get set up? ###
+### INSTALLATION PREREQUISITES ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Apache2 installed
+* PHP 5.7 and greater installed
+* Mysql
 
+### CONFIGURATION DETAILS ###
+After cloning this project to your desired directory[Windows: C:~/xampp/htdocs , Linux: /var/www/html], you need to do the following.
+
+* 
 ### Contribution guidelines ###
 
 * Writing tests
