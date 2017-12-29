@@ -15,6 +15,7 @@ This file is to instruct you installing and successfully running Addax.
 
 ### CONFIGURATION DETAILS ###
 After cloning this project to your desired directory[Windows: C:~/xampp/htdocs , Linux: /var/www/html], you need to do the following.  
+  
 * Configure the database  
 -> In DB management app (eg:phpmyadmin, workbench,...), create a database.   
 -> Import the database(addax.sql) from Addax root folder, to your newly created database.  
