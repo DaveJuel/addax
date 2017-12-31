@@ -5,6 +5,9 @@
    "require": {
       "ext-gettext": "*"
     },
+    "require":{
+        "ext-mbstring":"*"
+    },
    "require-dev": {
       "heroku/heroku-buildpack-php": "*"
    }
