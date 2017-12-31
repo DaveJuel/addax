@@ -10,7 +10,9 @@ session_start();
 /*
  * TODO: You need to replace username and password by your specific db credentials
  */
-require 'rb.php';R::setup("mysql:host=localhost;dbname=addax", "username", "password");
+require 'rb.php';
+require 'config.php';
+R::setup("mysql:host=$host;dbname=$db", "$db_user", "$pass_phrase");
 
 class UIfeeders {
 
