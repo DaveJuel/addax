@@ -1,15 +1,24 @@
+<?php
+//login checking
+//$login_status = $user -> checkLogin();
+//if ($login_status != TRUE) {
+//header("location:login.php");
+//}
+?>
+<!--THIS IS THE MAIN LAYOUT OF THE APPLICATION -->
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- Title -->
-        <title><?php echo $main->appName . " | " . $title ?></title>
-
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><?php echo $title ?></title>
         <meta content="width=device-width, initial-scale=1" name="viewport"/>
         <meta charset="UTF-8">
-        <meta name="description" content="Admin Dashboard Template" />
-        <meta name="keywords" content="admin,dashboard" />
-        <meta name="author" content="Steelcoders" />
-
+        <meta name="description" content="Teacher's pot" />
+        <meta name="keywords" content="teacher,money,saving" />
+        <meta name="author" content="echobrain" />
         <!-- Styles -->
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
         <link href="../plugins/pace-master/themes/blue/pace-theme-flash.css" rel="stylesheet"/>
@@ -36,14 +45,21 @@
         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
-
     </head>
-    <body class="page-login login-alt">
+    <body class="page-login">
         <main class="page-content">
             <div class="page-inner">
                 <div id="main-wrapper">
-                    <?php echo $content; ?>
-                </div> <!-- Main Wrapper -->
+                    <div class="row">
+                        <div class="col-md-3 center">
+                            <div class="login-box">
+                                <a href="login.php" class="logo-name text-lg text-center">ECHOPOT</a>
+                                <?php echo $content; ?>
+                                <p class="text-center m-t-xs text-sm"><?php echo date("Y") ?> &copy; ECHOPOT by EchoBrain LTD.</p>
+                            </div>
+                        </div>
+                    </div><!-- Row -->
+                </div><!-- Main Wrapper -->
             </div><!-- Page Inner -->
         </main><!-- Page Content -->
         <!-- Javascripts -->
@@ -58,8 +74,6 @@
         <script src="../plugins/offcanvasmenueffects/js/classie.js"></script>
         <script src="../plugins/waves/waves.min.js"></script>
         <script src="../js/modern.min.js"></script>
-        <script src="../js/interface.js"></script>
-        <script src="../js/main.js"></script>
-
+        
     </body>
 </html>

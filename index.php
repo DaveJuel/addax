@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="refresh" content="0;url=views/index.php">
-		<title>BEAST|Web portal </title>
+		<meta http-equiv="refresh" content="0;url=views/home.php">
+		<title>ADDAX |Start </title>
 		<script language="javascript">
-			window.location.href = "views/login.php"
+			window.location.href = "views/home.php"
 		</script>
 	</head>
 	<body>
-	 Activate Javascript in your browser and go to <a href="views/login.php">Start page</a>
+	 Activate Javascript in your browser and go to <a href="views/home.php">Start page</a>
 	</body>
 </html>

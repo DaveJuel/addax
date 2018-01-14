@@ -1,6 +1,78 @@
-<?php require '../includes/interface.php'; ?>
-<?php $title = 'Dashboard' ?>
- <?php ob_start() ?>
-  
- <?php $content = ob_get_clean() ?>
- <?php include '../layout/layout_main.php' ?>
+<?php require '../admin/includes/interface.php'; ?>
+<?php
+$title = "Home";
+ob_start();
+?>
+<!-- ========== REVOLUTION SLIDER ========== -->
+<section id="slider" class="full_slider">
+    <div class="rev_slider_wrapper fullscreen-container">
+        <div id="fullscreen_slider" class="rev_slider fullscreenbanner gradient_slider" style="display:none">
+            <ul>
+                <?php $web->showContent("slider",1,["image","title","description"]); ?>
+            </ul>
+        </div>
+    </div>      
+</section>
+<!-- ========== FEATURES ========== -->
+<section class="lightgrey_bg" id="features">
+    <div class="container">
+        <div class="main_title mt_wave a_center">
+            <h2>OUR AWESOME FEATURES</h2>
+        </div>
+        <p class="main_description a_center">We make your website awesome.</p>
+        <div class="row">
+          <?php $web->showContent("features",2,["title","description"]); ?>
+        </div>
+    </div>
+</section>
+<!-- ========== CONTACT ========== -->
+<section class="white_bg" id="contact">
+    <div class="container">
+        <div class="main_title mt_wave mt_yellow a_center">
+            <h2>CONTACT US</h2>
+        </div>
+        <p class="main_description a_center">Contact us for any support you may need.</p>
+        <div class="row">            
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="contact-items">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="contact-item">
+                                <i class="glyphicon glyphicon-map-marker"></i>
+                                <h6>Kigali - Rwanda</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="contact-item">
+                                <i class="glyphicon glyphicon-phone-alt"></i>
+                                <h6>+250 788353869</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="contact-item">
+                                <i class="fa fa-envelope"></i>
+                                <h6>davejuelz@gmail.com</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
+                    <div id="contact-result"></div>
+                    <div class="form-group">
+                        <input class="form-control" name="name" placeholder="Your Name" type="text">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" name="email" type="email" placeholder="Your Email Address">
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" name="message" placeholder="Your Message"></textarea>
+                    </div>
+                    <input class="button btn_lg btn_blue btn_full upper" type="submit" name="action" value="Send message">
+                    <?php echo $web->status; ?>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<?php $content = ob_get_clean(); ?>
+<?php include '../layout/layout_main.php'; ?>
