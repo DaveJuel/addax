@@ -18,10 +18,10 @@ class UIfeeders {
     public $instance;
     public $field;
     public $images = [
-        "../images/defaults/operation_surgery_hospital.jpg",
-        "../images/defaults/stethoscope.jpg",
-        "../images/defaults/stestoskop_heart_curve.jpg",
-        "../images/defaults/surgical_instruments_hands_technician.jpg"
+        "../images/defaults/mechanics-2170638_1920.jpg",
+        "../images/defaults/mockup-654585_1280.jpg",
+        "../images/defaults/statistic-1820320_1280.jpg",
+        "../images/defaults/tetris-749690_1920.jpg"
     ];
 
     /**
@@ -170,6 +170,73 @@ class main extends UIfeeders {
                 break;
         }
         return $feedback;
+    }
+
+    public function displayMessageTable($header, $message, $action) {
+        /*
+         * Start table
+         */
+        echo '<div class="col-md-10">
+                <div class="mailbox-content">
+                    <table class="table">';
+        /*
+         * Display headers
+         */
+        echo '<thead>';
+        echo' <tr> <th colspan="1" class="hidden-xs">
+                            <span><input type="checkbox" class="check-mail-all"></span>
+                    </th>
+                    <th class="text-right" colspan="5">                            
+                            <a class="btn btn-default m-r-sm" data-toggle="tooltip" data-placement="top" title="Refresh"><i class="fa fa-refresh"></i></a>                                                       
+                            <div class="btn-group">
+                                <a class="btn btn-default"><i class="fa fa-angle-left"></i></a>
+                                <a class="btn btn-default"><i class="fa fa-angle-right"></i></a>
+                            </div>
+                        </th>
+                    </tr>';
+        echo '<thead>';
+        /*
+         * Table content
+         */
+        echo '<tbody>';
+        for ($count = 0; $count < count($message); $count++) {
+            $sender = $message[$count]['sender'];
+            $content = $message[$count]['message'];
+            $time = $message[$count]['created_on'];
+            $status = $message[$count]['status'];
+            if (isset($action)) {
+                $link = "read.php?action=" . $action . "&content=" . $message[$count]['content'] . "&ref=" . $message[$count]['id'];
+            } else {
+                $link = "read.php?content=" . $message[$count]['content'] . "&ref=" . $message[$count]['id'];
+            }
+
+            echo '<tr class="' . $status . '">
+                        <td class="hidden-xs">
+                            <span><input type="checkbox" class="checkbox-mail"></span>
+                        </td>
+                        <td class="hidden-xs">
+                            <i class="fa fa-star icon-state-warning"></i>
+                        </td>
+                        <td class="hidden-xs">
+                            ' . $sender . '
+                        </td>
+                        <td>
+                            <a href="' . $link . '">' . $content . '</a>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            ' . $time . '
+                        </td>
+                    </tr>';
+        }
+        echo '</tbody>';
+        /*
+         * end table
+         */
+        echo '</table>
+                </div>
+            </div>';
     }
 
     /**
@@ -850,12 +917,65 @@ class main extends UIfeeders {
                     </div>';
     }
 
+    /*
+     * validating the numbers
+     */
+
+    public function standardize($phone) {
+        if (strlen($phone) == 10) {
+            $phone = "25" . $phone;
+        } else if (strlen($phone) == 9) {
+            $phone = "250" . $phone;
+        } else if (strlen($phone) == 12) {
+            $phone = $phone;
+        } else {
+            $phone = "Failed to build";
+        }
+        return $phone;
+    }
+
 }
 
 //user object
 class user extends main {
 
+    public $fname;
+    public $lname;
+    public $username;
+    public $email;
+    public $phone;
+    public $address;
     public $status = "";
+    public $loggedIn = null;
+    public $toVerify = null;
+    private $userType = [
+        0 => "administrator",
+        1 => "editor",
+        2 => "visitor"
+    ];
+    public $userlist = [];
+
+    function __construct() {
+        $this->fetch();
+    }
+
+    /**
+     * <h1>count</h1>
+     * <p>Counting the user of the system</p>
+     */
+    public function fetch() {
+        $users = [];
+        $userType = $this->userType;
+        for ($count = 0; $count < count($userType); $count++) {
+            $type = $userType[$count];
+            try {
+                $users[$type] = R::getAll("SELECT * FROM credentials WHERE type='$count'");
+            } catch (Exception $e) {
+                error_log("USER(fetch)" . $e);
+            }
+        }
+        $this->userlist = $users;
+    }
 
     //getting the user
     public function userList($type) {
@@ -1005,6 +1125,47 @@ class user extends main {
         } catch (Exception $e) {
             $this->status = $this->feedbackFormat(0, "Login error");
         }
+    }
+
+    /**
+     * Return the user type of the logged in user
+     */
+    public function getUserType() {
+        $userType = null;
+        if (isset($_SESSION["user_id"])) {
+            $userId = $_SESSION["user_id"];
+            try {
+                $type = R::getCell("SELECT DISTINCT type FROM credentials WHERE user = '$userId'");
+                if ($type != null) {
+                    $userType = $this->userType[$type];
+                }
+            } catch (Exception $e) {
+                error_log("USER[getUserType]:" . $e);
+            }
+        }
+        return $userType;
+    }
+
+    /**
+     * <h1>getUserDetails</h1>
+     * <p>This method is to fetch information of the user.</p>
+     * @param Int $userId The user id
+     * @return Array Returns an array that contains all user information.
+     */
+    public function getUserDetails($userId) {
+        $user = null;
+        try {
+            $user = R::getRow("SELECT u.id,u.fname,u.lname,u.address,u.oname,u.email,u.phone,c.user,c.username,c.type FROM user AS u JOIN credentials AS c WHERE u.id=c.user AND u.id='$userId'");
+            $this->fname = $user['fname'];
+            $this->lname = $user['lname'];
+            $this->username = $user['username'];
+            $this->email = $user['email'];
+            $this->phone = $user['phone'];
+            $this->address = $user['address'];
+        } catch (Exception $e) {
+            error_log("USER(getUserDetails):" . $e);
+        }
+        return $user;
     }
 
 }
@@ -1291,6 +1452,579 @@ class content extends main {
 }
 
 /**
+ * <h1>message</h1>
+ * <p>This is the class to handle the communication through the system</p>
+ * 
+ */
+class message extends main {
+
+    public $count = 0;
+    public $head = "No new message.";
+    public $notRead = [];
+    public $sent = [];
+    public $received = [];
+    public $sender;
+    public $email;
+    public $message;
+    public $receiver;
+    public $createdOn;
+
+    function __construct() {
+        $user = new user();
+        $this->notRead = [];
+        $this->sent = [];
+        $this->received = [];
+        if ($user->checkLogin()) {
+            $this->count();
+            $this->fetch();
+        }
+    }
+
+    /**
+     * <h1>send</h1>
+     * <p>This is the method to send messages through the system</p>
+     */
+    public function send($sender, $email, $message) {
+        $user = new user();
+        $fullname = explode(" ", $sender);
+        if (isset($fullname[0]) && isset($fullname[1])) {
+            $fname = $fullname[0];
+            $lname = $fullname[1];
+        } else {
+            $lname = $fname = $sender;
+        }
+        /*
+         * Create user before sending message
+         */
+        //$user->add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type, $age, $gender);
+        $user_id = $user->add($fname, $lname, null, $email, null, null, $email, $lname, 4, $age);
+        try {
+            $messageQR = R::dispense("message");
+            $messageQR->user = $user_id;
+            $messageQR->sender = $sender;
+            $messageQR->email = $email;
+            $messageQR->message = $message;
+            $messageQR->receiver = 0;
+            $messageQR->created_on = date("Y-m-d h:m:s");
+            $messageQR->status = 0;
+            R::store($messageQR);
+            $this->status = $this->feedbackFormat(1, "Message sent successful!");
+        } catch (Exception $e) {
+            $this->status = $this->feedbackFormat(0, "Unable to post message!");
+            error_log("ERROR(web:postContactMessage)" + $e);
+        }
+    }
+
+    /**
+     * <h1>count</h1>
+     * <p>This is the method count message.</p>
+     */
+    public function count() {
+        $userObj = new user();
+        $userType = $userObj->getUserType();
+        $userId = $_SESSION['user_id'];
+        $message = ["sent" => 0, "received" => 0, "not read" => 0];
+        try {
+            $notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$userType' AND status='0'");
+            $this->count = count($notRead);
+            if ($this->count > 0) {
+                $this->head = "You have " . $this->count . " messages";
+            }
+        } catch (Exception $e) {
+            error_log("MESSAGE(count):" . $e);
+        }
+        return $message;
+    }
+
+    /**
+     * <h1>receive</h1>
+     * <p>This is the method to display received messages</p>     
+     */
+    public function receive() {
+        $received = $this->received;
+        if (count($received) > 0) {
+            $this->displayMessageTable(null, $received, "read");
+        } else {
+            //TODO: Add no data to display format
+        }
+    }
+
+    /**
+     * <h1>read</h1>
+     * <p>This function is to read the content of the message</p>
+     */
+    public function read($messageId) {
+
+        $received = $this->received;
+        for ($count = 0; $count < count($received); $count++) {
+            if ($messageId == $received[$count]['id']) {
+                $this->sender = $received[$count]['sender'];
+                $this->message = $received[$count]['message'];
+                $this->createdOn = $received[$count]['created_on'];
+                /*
+                 * Change message status
+                 */
+                try {
+                    R::exec("UPDATE message SET status='1' WHERE id='$messageId'");
+                } catch (Exception $e) {
+                    error_log("MESSAGE(read):" . $e);
+                }
+                break;
+            }
+        }
+    }
+
+    private function alertDisplayFormat($messageDetails) {
+        echo '<li>
+                    <a href="' . $messageDetails['link'] . '">
+                        <div class="msg-img"><div class="online off"></div><img class="img-circle" src="../images/noimage-team.png" alt=""></div>
+                        <p class="msg-name">' . $messageDetails['sender'] . '</p>
+                        <p class="msg-text">' . $messageDetails['message'] . '</p>
+                        <p class="msg-time"></p>
+                    </a>
+                </li>';
+    }
+
+    private function fetch() {
+        $userObj = new user();
+        $userType = $userObj->getUserType();
+        $userId = $_SESSION['user_id'];
+        try {
+            //$notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$userType' AND status='0'");
+            $notRead = R::getAll("SELECT id,sender,message,created_on,status FROM message WHERE receiver='$userId' OR receiver='$userType' AND status='0'");
+            if (count($notRead) > 0) {
+                for ($countNR = 0; $countNR < count($notRead); $countNR++) {
+                    $details[$countNR] = [
+                        "id" => $notRead[$countNR]['id'],
+                        "sender" => $notRead[$countNR]['sender'],
+                        "message" => $notRead[$countNR]['message'],
+                        "created_on" => $notRead[$countNR]['created_on'],
+                        "status" => "unread",
+                        "content" => "message"
+                    ];
+                }
+                $this->notRead = $details;
+            }
+            $received = R::getAll("SELECT id,sender,message,created_on,status FROM message WHERE receiver='$userType' OR receiver='$userId' ");
+            if (count($received) > 0) {
+                for ($count = 0; $count < count($received); $count++) {
+                    if ($received[$count]['status'] == 0) {
+                        $status = "unread";
+                    } else {
+                        $status = "read";
+                    }
+                    $details[$count] = [
+                        "id" => $received[$count]['id'],
+                        "sender" => $received[$count]['sender'],
+                        "message" => $received[$count]['message'],
+                        "created_on" => $received[$count]['created_on'],
+                        "status" => $status,
+                        "content" => "message"
+                    ];
+                }
+                $this->received = $details;
+            }
+        } catch (Exception $e) {
+            error_log("MESSAGE(fetchMessage):" . $e);
+        }
+    }
+
+    public function alert() {
+        try {
+            $notRead = $this->notRead;
+            for ($count = 0; $count < count($notRead); $count++) {
+                $link = "read.php?action=read&content=" . $notRead[$count]['content'] . "&ref=" . $notRead[$count]['id'];
+                $details = [
+                    "content" => "message",
+                    "id" => $notRead[$count]['id'],
+                    "sender" => $notRead[$count]['sender'],
+                    "message" => $notRead[$count]['message'],
+                    "link" => $link,
+                    "time" => ""
+                ];
+                $this->alertDisplayFormat($details);
+            }
+        } catch (Exception $e) {
+            error_log("MESSAGE(count):" . $e);
+        }
+    }
+
+}
+
+/**
+ * <h1>notification</h1>
+ * <p>This class is to handle notification</p>
+ */
+class notification extends main {
+
+    /**
+     * To count the number of notifications
+     */
+    public $count = 0;
+    public $head = "Nothing to notify";
+    public $checked = [];
+    public $notified = [];
+    public $title;
+    public $content;
+    public $createdOn;
+
+    function __construct() {
+        $user = new user();
+        if ($user->checkLogin()) {
+            $this->count();
+            $this->fetch();
+        }
+    }
+
+    /**
+     * <h1>alertDisplayFormat</h1>
+     * <p>This method is the build the format of an alert</p>
+     */
+    private function alertDisplayFormat($notificationDetails) {
+        echo ' <li>
+                    <a href="' . $notificationDetails['link'] . '">
+                        <div class="task-icon badge badge-success"><i class="icon-pin"></i></div>
+                        <span class="badge badge-roundless badge-default pull-right">' . $notificationDetails['time'] . '</span>
+                        <p class="task-details">' . $notificationDetails['description'] . '.</p>
+                    </a>
+                </li>';
+    }
+
+    public function alert() {
+        $userObj = new user();
+        $userType = $userObj->getUserType();
+        $userId = $_SESSION['user_id'];
+        try {
+            $userTypeCode = R::getCell("SELECT DISTINCT type FROM credentials WHERE user='$userId' LIMIT 1");
+            $notificationUL = R::getAll("SELECT id,title,description,created_on FROM notification WHERE privacy='1' AND dedicated='$userTypeCode' ORDER BY created_on DESC");
+            for ($countUL = 0; $countUL < count($notificationUL); $countUL++) {
+                $link = "read.php?action=read&content=notification&ref=" . $notificationUL[$countUL]['id'];
+                $details = [
+                    "description" => $notificationUL[$countUL]['description'],
+                    "link" => $link,
+                    "time" => ""
+                ];
+                $this->alertDisplayFormat($details);
+            }
+            $notificationPNP = R::getAll("SELECT id,title,description,created_on FROM notification WHERE privacy='2' AND dedicated='$userId' ORDER BY created_on DESC");
+            for ($countPNP = 0; $countPNP < count($notificationPNP); $countPNP++) {
+                $link = "read.php?action=read&content=notification&ref=" . $notificationPNP[$countPNP]['id'];
+                $details = [
+                    "description" => $notificationPNP[$countPNP]['description'],
+                    "link" => $link,
+                    "time" => ""
+                ];
+                $this->alertDisplayFormat($details);
+            }
+        } catch (Exception $e) {
+            error_log("NOTIFICATION(alert):" . $e);
+        }
+    }
+
+    /**
+     * <h1>notify</h1>
+     * <p>This method is to notify about recent activity</p>
+     * @param 
+     */
+    public function add($notificationDetails) {
+        if (isset($notificationDetails) && count($notificationDetails) > 0) {
+            //get all values
+            $notification = R::dispense("notification");
+            $notification->title = $notificationDetails["title"];
+            $notification->description = $notificationDetails["description"];
+            $notification->privacy = $notificationDetails["privacy"];
+            $notification->dedicated = $notificationDetails["dedicated"];
+            $notification->status = $notificationDetails["status"];
+            $notification->created_by = $notificationDetails["created_by"];
+            $notification->created_on = date("Y-m-d h:m:s");
+            $notification->category = $notificationDetails["category"];
+            $notification->last_update_on = "Not set";
+            R::store($notification);
+        } else {
+            $this->feedbackFormat(0, "Notification not sent");
+        }
+    }
+
+    /**
+     * <h1>count</h1>
+     * <p>This method is to count the number of notification</p>
+     */
+    public function count() {
+        $userObj = new user();
+        $userType = $userObj->getUserType();
+        $userId = $_SESSION['user_id'];
+        try {
+            /*
+             * Getting the user type
+             */
+            $userTypeCode = R::getCell("SELECT DISTINCT type FROM credentials WHERE user='$userId' LIMIT 1");
+            /*
+             * Counting notifications dedicated to user types
+             */
+            $notificationUL = R::getAll("SELECT DISTINCT id FROM notification WHERE privacy='1' AND dedicated='$userTypeCode' AND status='0'");
+            /*
+             * Counting notification dedicated to the logged in user
+             */
+            $notificationPNP = R::getAll("SELECT DISTINCT id FROM notification WHERE privacy='2' AND dedicated='$userId' AND status='0'");
+            $this->count = count($notificationUL) + count($notificationPNP);
+            if ($this->count > 0) {
+                $this->head = "You have " . $this->count . " notifications!";
+            }
+        } catch (Exception $e) {
+            error_log("NOTIFICATION(count):" . $e);
+        }
+    }
+
+    public function fetch() {
+        $userObj = new user();
+        $userType = $userObj->getUserType();
+        $userId = $_SESSION['user_id'];
+        $details = [];
+        try {
+            $userTypeCode = R::getCell("SELECT DISTINCT type FROM credentials WHERE user='$userId' LIMIT 1");
+            $notificationUL = R::getAll("SELECT id,title,description,created_on,status FROM notification WHERE privacy='1' AND dedicated='$userTypeCode' ORDER BY created_on DESC");
+            for ($countUL = 0; $countUL < count($notificationUL); $countUL++) {
+                if ($notificationUL[$countUL]['status'] == 0) {
+                    $status = "unread";
+                } else {
+                    $status = "read";
+                }
+                $details[$countUL] = [
+                    "id" => $notificationUL[$countUL]['id'],
+                    "sender" => $notificationUL[$countUL]['title'],
+                    "message" => $notificationUL[$countUL]['description'],
+                    "created_on" => $notificationUL[$countUL]['created_on'],
+                    "status" => $status,
+                    "content" => "notification"
+                ];
+            }
+            $this->checked = $details;
+            $notificationPNP = R::getAll("SELECT id,title,description,created_on FROM notification WHERE privacy='2' AND dedicated='$userId' ORDER BY created_on DESC");
+            for ($countPNP = 0; $countPNP < count($notificationPNP); $countPNP++) {
+                if ($notificationPNP[$countPNP]['status'] == 0) {
+                    $status = "unread";
+                } else {
+                    $status = "read";
+                }
+                $details[$countPNP] = [
+                    "id" => $notificationPNP[$countPNP]['id'],
+                    "sender" => $notificationPNP[$countPNP]['title'],
+                    "message" => $notificationPNP[$countPNP]['description'],
+                    "created_on" => $notificationPNP[$countPNP]['created_on'],
+                    "status" => $status,
+                    "content" => "notification"
+                ];
+            }
+            $this->notified = $details;
+        } catch (Exception $e) {
+            error_log("NOTIFICATION()fetch" . $e);
+        }
+    }
+
+    /**
+     * <h1>read</h1>
+     * <p>This function is to read the content of the notification</p>
+     */
+    public function read($messageId) {
+        $notified = $this->notified;
+        for ($count = 0; $count < count($notified); $count++) {
+            if ($messageId == $notified[$count]['id']) {
+                $this->title = $notified[$count]['sender'];
+                $this->content = $notified[$count]['message'];
+                $this->createdOn = $notified[$count]['created_on'];
+                /*
+                 * Change message status
+                 */
+                try {
+                    R::exec("UPDATE notification SET status='1' WHERE id='$messageId'");
+                } catch (Exception $e) {
+                    error_log("NOTIFICATION(read):" . $e);
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * <h1>receive</h1>
+     * <p>This is the method to display received notifications</p>     
+     */
+    public function receive() {
+        $notified = $this->notified;
+        if (count($notified) > 0) {
+            $this->displayMessageTable(null, $notified, null);
+        } else {
+            //TODO: Add no data to display format
+        }
+    }
+
+}
+
+//the  sms class
+class sms extends main {
+
+    public $status = "";
+
+    //sending the sms
+    public function send($recipient, $subject, $message) {
+        $recipients = array();
+        $file = null;
+        $sent = 0;
+        $message = str_replace(" ", "+", $message);
+        //getting the recipient type
+        if ($recipient == "list") {
+            //get the added list
+            $user = $this->user;
+            try {
+                $list = R::getAll("SELECT id,name FROM file WHERE added_by='$user' ORDER BY id DESC LIMIT 1");
+                $handler = new file_handler();
+                $file = $list[0]['name'];
+                $recipients = $handler->readExcel($file);
+            } catch (Exception $e) {
+                $this->status = $this->feedbackFormat(0, "Error occured");
+                error_log($e);
+            }
+        } else {
+            $recipients = explode(";", $recipient);
+        }
+        //sending messages
+        for ($counter = 0; $counter < count($recipients); $counter++) {
+            $status = false;
+            $number = $this->standardize($recipients[$counter]);
+            $userkey = new user;
+            $stockInfo = $this->stockBalance($_SESSION['user_id']);
+            $balance = $stockInfo['quantity'];
+            if ($this->serviceCaller($message, $number, $subject)) {
+                $sent = $sent + 1;
+                $status = TRUE;
+            }
+            //record the details
+            try {
+                $sms = R::dispense("message");
+                $sms->user = $_SESSION['user_id'];
+                $sms->subject = $subject;
+                $sms->sender = $_SESSION['user_id'];
+                $sms->content = $message;
+                $sms->recipient = $number;
+                $sms->type = "sms";
+                $sms->sent_on = date("Y-m-d h:m:s");
+                $sms->status = $status;
+                $sms->file = $file;
+                R::store($sms);
+            } catch (Exception $e) {
+                error_log($e);
+            }
+        }
+        if ($sent < 0) {
+            $this->status = $this->feedbackFormat(1, $sent . " Message(s) sent");
+        } else {
+            $this->status = $this->feedbackFormat(0, "No message sent<span class='fa fa-warning'></span> ");
+        }
+    }
+
+    //sending message with the http API
+    private function serviceCaller($message, $phone, $sender) {
+        $status = FALSE;
+        $send = new Sender("client.rmlconnect.net", "8080", "paradigm", "2hLn4PXn", $sender, $message, $phone, 0, 1);
+        $response = $send->Submit();
+        $this->status = $response;
+        error_log($this->status);
+        $response = explode("|", $response);
+        $error_code = $response[0];
+        if ($error_code == "1701") {
+            $status = TRUE;
+            $this->status = "Message sent successfully!";
+        } else {
+            $this->status = "Message not sent";
+        }
+        return $status;
+    }
+
+    public function history($user, $caller) {
+        $response = array();
+        $response['response'] = array();
+        try {
+            $header = array('No', 'Time', 'Message subject', 'Recipient', 'Status');
+
+            $list = R::getAll("SELECT sent_on,subject,recipient,status FROM message WHERE sender='$user'");
+            if (count($list) != 0) {
+                $tableContent = array();
+                if ($caller == "site") {
+                    for ($row = 0; $row < count($list); $row++) {
+                        $rowNumber = $row + 1;
+                        $time = $list[$row]['sent_on'];
+                        $subject = $list[$row]['subject'];
+                        $recipient = $list[$row]['recipient'];
+                        $status = $list[$row]['status'];
+                        if ($status == 0) {
+                            $status = "<span class='text-danger'>Failed <i class='fa fa-thumbs-down'></i></span>";
+                        } else {
+                            $status = "<span class='text-success'>Succeeded <i class='fa fa-thumbs-up'></i></span>";
+                        }
+                        $tableContent[$row] = array($rowNumber, $time, $subject, $recipient, $status);
+                    }
+                    $this->displayTable($header, $tableContent, null);
+                } else {
+                    $result = array("error_code" => 0, "error_txt" => "success", "messages" => $list);
+                    array_push($response['response'], $result);
+                }
+            } else {
+                if ($caller == "site") {
+                    $this->displayTable($header, null, null);
+                } else {
+                    $result = array("error_code" => 1, "error_txt" => "no result");
+                    array_push($response['response'], $result);
+                }
+            }
+        } catch (Exception $e) {
+            error_log($e);
+            $this->displayTable($header, null, null);
+        }
+        return $response;
+    }
+
+    //THE COUNTER FUNCTION
+    public function counter($criteria, $user) {
+        $number = 0;
+        try {
+            if ($criteria == "sent" && !isset($user)) {
+                $sql = "SELECT * FROM message WHERE type='sms' AND sent_on > '$this->startTime' AND sent_on<'$this->endTime'";
+            } else if ($criteria == "failed" && !isset($user)) {
+                $sql = "SELECT * FROM message WHERE type='sms' AND sent_on > '$this->startTime' AND sent_on<'$this->endTime' AND status = '0'";
+            } else if ($criteria == "sent" && isset($user)) {
+                $sql = "SELECT * FROM message WHERE type='sms'AND sender='$user'";
+            } else if ($criteria == "failed" && isset($user)) {
+                $sql = "SELECT * FROM message WHERE type='sms' AND sender='$user' AND status = '0'";
+            } else if ($criteria == "success" && isset($user)) {
+                $sql = "SELECT * FROM message WHERE type='sms' AND sender='$user' AND status = '1'";
+            }
+            $sms = R::getAll($sql);
+            $number = count($sms);
+        } catch (Exception $e) {
+            error_log($e);
+        }
+        return $number;
+    }
+
+    /*
+      CHECK IF STOCK EXISTS
+     *      */
+
+    public function stockBalance($user) {
+        $response = array();
+        try {
+            $quantity = R::getCell("SELECT quantity FROM stock WHERE client='$user'");
+            $response = array("status" => true, "quantity" => $quantity);
+        } catch (Exception $e) {
+            error_log($e);
+            $response = array("status" => FALSE, "quantity" => $quantity);
+        }
+        return $response;
+    }
+
+}
+
+/**
  * <h1>dashboard</h1>
  * <p>This class is to handle the dashboard of the application.</p>
  */
@@ -1311,35 +2045,19 @@ class dashboard {
      * <p>Populating the values to be displayed in the dashboard</p>
      */
     public function populate() {
-//        $userObj = new user();
-//        $messageObj = new message();
-//        $notificationObj = new notification();
-//        $userType = $userObj->getUserType();
-//        if ($userType == "Administrator") {
-//            $titleList = ["Users", "Notifications", "Messages", "Log"];
-//            $countList = [89, $notificationObj->count, $messageObj->count, 521];
-//        } else if ($userType == "Headquarter") {
-//            $request = $this->countRequest(null);
-//            $titleList = ["Donors", "Regions", "Stock (Liters)", "Request"];
-//            $countList = [$this->countDonors(), $this->countRegions(), $this->getStock(), $request["pending"]];
-//        } else if ($userType == "Regional") {
-//            $titleList = ["Donors", "Notifications", "Stock (Liters)", "New application"];
-//            $countList = [$this->countDonors(), $notificationObj->count, $this->getStock(), $this->countApplication()];
-//        } else if ($userType == "Hospital") {
-//            $inst = $userObj->getInstitution($_SESSION['user_id']);
-//            $request = $this->countRequest($inst['id']);
-//            $titleList = ["Approved request", "Notifications", "messages", "Pending Request"];
-//            $countList = [$request['approved'], $notificationObj->count, $messageObj->count, $request['pending']];
-//        } else if ($userType == "Donor") {
-//            $donationDetails = $this->getDonatingDetails($_SESSION['user_id']);
-//            $titleList = ["Times donated", "Quantity donated", "Notifications", "Messages"];
-//            $countList = [$donationDetails['occurence'], $donationDetails['quantity'], $notificationObj->count, $messageObj->count];
-//        } else {
-//            $titleList = ["?", "?", "?", "?"];
-//            $countList = [0, 0, 0, 0];
-//        }
-//        $this->number = $countList;
-//        $this->title = $titleList;
+        $userObj = new user();
+        $messageObj = new message();
+        $notificationObj = new notification();
+        $userType = $userObj->getUserType();
+        if ($userType == "administrator") {
+            $titleList = ["Users", "Notifications", "Messages", "Log"];
+            $countList = [89, $notificationObj->count, $messageObj->count, 521];
+        } else {
+            $countList = ["-", "-", "-", "-"];
+            $titleList = ["N/A", "N/A", "N/A", "N/A"];
+        }
+        $this->number = $countList;
+        $this->title = $titleList;
     }
 
 }
@@ -1411,6 +2129,167 @@ class contentFormat extends main {
         } catch (Exception $e) {
             error_log("ERROR(content:slider):" . $e);
         }
+    }
+
+}
+
+class Sender {
+
+    var $host;
+    var $port;
+    /*
+     * Username that is to be used for submission
+     */
+    var $strUserName;
+    /*
+     * password that is to be used along with username
+     */
+    var $strPassword;
+    /*
+     * Sender Id to be used for submitting the message
+     */
+    var $strSender;
+    /*
+     * Message content that is to be transmitted
+     */
+    var $strMessage;
+    /*
+     * Mobile No is to be transmitted.
+     */
+    var $strMobile;
+    /*
+     * What type of the message that is to be sent
+     * <ul>
+     * <li>0:means plain text</li>
+     * <li>1:means flash</li>
+     * <li>2:means Unicode (Message content should be in Hex)</li>
+     * <li>6:means Unicode Flash (Message content should be in Hex)</li>
+     * </ul>
+     */
+    var $strMessageType;
+    /*
+     * Require DLR or not
+     * <ul>
+     * <li>0:means DLR is not Required</li>
+     * <li>1:means DLR is Required</li>
+     * </ul>
+     */
+    var $strDlr;
+
+    private function sms__unicode($message) {
+        $hex1 = '';
+        if (function_exists('iconv')) {
+            $latin = @iconv('UTF-8', 'ISO-8859-1', $message);
+            if (strcmp($latin, $message)) {
+                $arr = unpack('H*hex', @iconv('UTF-8', 'UCS-2BE', $message));
+                $hex1 = strtoupper($arr['hex']);
+            }
+            if ($hex1 == '') {
+                $hex2 = '';
+                $hex = '';
+                for ($i = 0; $i < strlen($message); $i++) {
+                    $hex = dechex(ord($message[$i]));
+                    $len = strlen($hex);
+                    $add = 4 - $len;
+                    if ($len < 4) {
+                        for ($j = 0; $j < $add; $j++) {
+                            $hex = "0" . $hex;
+                        }
+                    }
+                    $hex2 .= $hex;
+                }
+                return $hex2;
+            } else {
+                return $hex1;
+            }
+        } else {
+            print 'iconv Function Not Exists !';
+        }
+    }
+
+//Constructor..
+    public function __construct($host, $port, $username, $password, $sender, $message, $mobile, $msgtype, $dlr) {
+        $this->host = $host;
+        $this->port = $port;
+        $this->strUserName = $username;
+        $this->strPassword = $password;
+        $this->strSender = $sender;
+        $this->strMessage = $message; //URL Encode The Message..
+        $this->strMobile = $mobile;
+        $this->strMessageType = $msgtype;
+        $this->strDlr = $dlr;
+    }
+
+    private function send_hex() {
+        $this->strMessage = $this->sms__unicode(
+                $this->strMessage);
+        try {
+            //Smpp http Url to send sms.
+            $live_url = "http://" . $this->host . ":" . $this->port . "/bulksms/bulksms?username=" . $this->strUserName .
+                    "&password=" . $this->strPassword . "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" .
+                    $this->strMobile . "&source=" . $this->strSender . "&message=" . $this->strMessage . "";
+            $parse_url = file($live_url);
+            echo $parse_url[0];
+        } catch (Exception $e) {
+            echo 'Message:' . $e->getMessage();
+        }
+    }
+
+    //send sms with curl
+    private function send_sms_curl() {
+        $response = "";
+        //Smpp http Url to send sms.
+        $url = "http://" . $this->host . ":" .
+                $this->port . "/bulksms/bulksms?username=" . $this->strUserName . "&password=" . $this->strPassword .
+                "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" . $this->strMobile .
+                "&source=" . $this->strSender .
+                "&message=" . $this->strMessage . "";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $contents = curl_exec($ch);
+        if (curl_errno($ch)) {
+            echo curl_error($ch);
+            echo "\n<br />";
+            $contents = '';
+        } else {
+            curl_close($ch);
+        }
+        if (!is_string($contents) || !strlen($contents)) {
+            $contents = 'Failed to get contents.';
+        }
+        return $contents;
+    }
+
+    //Sending the sms plain     
+    private function send_sms() {
+        $this->strMessage = urlencode($this->strMessage);
+        try {
+//Smpp http Url to send sms.
+            $live_url = "http://" . $this->host . ":" .
+                    $this->port . "/bulksms/bulksms?username=" . $this->strUserName . "&password=" . $this->strPassword .
+                    "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" . $this->strMobile .
+                    "&source=" . $this->strSender .
+                    "&message=" . $this->strMessage . "";
+            $parse_url = file($live_url);
+            $response = $parse_url[0];
+        } catch (Exception $e) {
+            $response = $e->getMessage();
+        }
+        return $response;
+    }
+
+    public function Submit() {
+        $response = "";
+        if ($this->strMessageType == "2" ||
+                $this->strMessageType == "6") {
+            //Call The Function Of String To HEX.
+            $response = $this->send_hex();
+        } else {
+            $response = $this->send_sms_curl();
+        }
+        return $response;
     }
 
 }

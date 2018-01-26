@@ -8,6 +8,9 @@ $subject = new subject();
 $content = new content();
 $web = new web ();
 $dashboard = new dashboard ();
+$message = new message ();
+$notification = new notification ();
+$smsKey = new sms ();
 $action = null;
 //getting caller details
 if (isset($_REQUEST['action'])) {
@@ -102,6 +105,18 @@ switch ($action) {
         } else {
             $main->status = $main->feedbackFormat(0, "ERROR: Form data not fetched!");
         }
+        break;
+    case 'Send message' :
+        $sender = $_REQUEST ['name'];
+        $email = $_REQUEST ['email'];
+        $messageTXT = $_REQUEST ['message'];
+        $message->send($sender, $email, $messageTXT);
+        break;
+    case 'Send' :
+        $recipient = $_REQUEST ['send_sms_recipient'];
+        $subject = $_REQUEST ['send_sms_subject'];
+        $messageTXT = $_REQUEST ['send_sms_message'];
+        $smsKey->send($recipient, $subject, $messageTXT);
         break;
     //UI callers
     case 'combo_tables':

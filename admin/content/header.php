@@ -2,10 +2,10 @@
     <nav class="profile-menu">
         <div class="profile"><img src="../images/noimage-team.png" width="60" alt="David Green"/><span><?php echo $_SESSION['username']; ?></span></div>
         <div class="profile-menu-list">
-            <a href="#"><i class="fa fa-star"></i><span>Favorites</span></a>
-            <a href="#"><i class="fa fa-bell"></i><span>Alerts</span></a>
-            <a href="#"><i class="fa fa-envelope"></i><span>Messages</span></a>
-            <a href="#"><i class="fa fa-comment"></i><span>Comments</span></a>
+            <a href="home.php"><i class="fa fa-home"></i><span>Home</span></a>
+            <a href="notifications.php"><i class="fa fa-bell"></i><span>Notifications</span></a>
+            <a href="messages.php"><i class="fa fa-envelope"></i><span>Messages</span></a>
+            <a href="sms.php"><i class="fa fa-envelope"></i><span>SMS</span></a> 
         </div>
     </nav>
     <button class="close-button" id="close-button">Close Menu</button>

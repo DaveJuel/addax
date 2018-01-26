@@ -6,7 +6,7 @@
                     <img src="../images/noimage-team.png" class="img-circle img-responsive" alt="">
                 </div>
                 <div class="sidebar-profile-details">
-                    <span><?php echo $_SESSION['username']; ?><br><small><?php echo $_SESSION['type']; ?></small></span>
+                    <span><?php echo $_SESSION['username']; ?><br><small><?php echo $user->getUserType(); ?></small></span>
                 </div>
             </a>
         </div>
@@ -14,7 +14,7 @@
     <ul class="menu accordion-menu">
         <li class="droplink"><a href="#" class="waves-effect waves-button"><span class="menu-icon glyphicon glyphicon-plus"></span><p>Add new</p><span class="arrow"></span></a>
             <ul class="sub-menu">
-                <?php if ($_SESSION['type'] == 'administrator') { ?>
+                <?php if ($user->getUserType()== "administrator")  { ?>
                     <li>
                         <a href="add_user.php">User</a>
                     </li>
@@ -30,7 +30,7 @@
                 <?php $main->makeLinks("view"); ?>
             </ul>
         </li>
-        <?php if ($_SESSION['type'] == 'administrator') { ?>
+        <?php if ($user->getUserType() == 'administrator') { ?>
             <li class="droplink"><a href="#" class="waves-effect waves-button"><span class="menu-icon glyphicon glyphicon-pushpin"></span><p>Subject</p><span class="arrow"></span></a>
                 <ul class="sub-menu">
                     <li>
@@ -43,6 +43,5 @@
             </li>
         <?php } ?>	
         <li><a href="profile.php" class="waves-effect waves-button"><span class="menu-icon glyphicon glyphicon-user"></span><p>Profile</p></a></li>
-        <li><a href="security.php" class="waves-effect waves-button"><span class="menu-icon glyphicon glyphicon-cog"></span><p>Security</p></a></li>
     </ul>
 </div>
