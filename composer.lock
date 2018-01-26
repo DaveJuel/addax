@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "94e6acf7b6f45b2d3d0d53ff184a6193",
+    "content-hash": "319a9bbbfeaed24f256c29928b2cd5c2",
     "packages": [],
     "packages-dev": [
         {
             "name": "heroku/heroku-buildpack-php",
-            "version": "v127",
+            "version": "v130",
             "source": {
                 "type": "git",
                 "url": "https://github.com/heroku/heroku-buildpack-php.git",
-                "reference": "4428a20862137d682c9c15434c82a65c20541f97"
+                "reference": "1bbbc45da0f80dbb75606972c26236172b7d724c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/4428a20862137d682c9c15434c82a65c20541f97",
-                "reference": "4428a20862137d682c9c15434c82a65c20541f97",
+                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/1bbbc45da0f80dbb75606972c26236172b7d724c",
+                "reference": "1bbbc45da0f80dbb75606972c26236172b7d724c",
                 "shasum": ""
             },
             "bin": [
@@ -49,7 +49,7 @@
                 "nginx",
                 "php"
             ],
-            "time": "2017-11-30T16:10:52+00:00"
+            "time": "2018-01-11T17:45:21+00:00"
         }
     ],
     "aliases": [],
@@ -58,7 +58,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-mbstring": "*"
+        "ext-curl": "*"
     },
     "platform-dev": []
 }
