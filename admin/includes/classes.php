@@ -12,7 +12,8 @@ session_start();
 require 'rb.php';
 require 'config.php';
 R::setup("mysql:host=$host;dbname=$db", "$db_user", "$pass_phrase");
-
+$main = new main();
+$main->dbname=$db;
 class UIfeeders {
 
     public $instance;
@@ -140,7 +141,7 @@ class main extends UIfeeders {
     public $status;
     public $appName = "Addax";
     public $author = "David NIWEWE";
-    public $dbname = "beast";
+    public $dbname = "";
 
     /**
      * <h1>feedbackFormat</h1>

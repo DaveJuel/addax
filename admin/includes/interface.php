@@ -2,7 +2,6 @@
 
 //Interface
 require 'classes.php';
-$main = new main();
 $user = new user();
 $subject = new subject();
 $content = new content();
