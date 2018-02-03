@@ -9,7 +9,7 @@
         "ext-mbstring":"*"
     },
     "require":{
-    "ext-curl":"*"
+        "ext-curl":"*"
     },
    "require-dev": {
       "heroku/heroku-buildpack-php": "*"
