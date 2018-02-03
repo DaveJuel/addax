@@ -2251,8 +2251,7 @@ class Sender {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $contents = curl_exec($ch);
         if (curl_errno($ch)) {
-            echo curl_error($ch);
-            echo "\n<br />";
+            error_log("SEND SMS CURL:". curl_error($ch));            
             $contents = '';
         } else {
             curl_close($ch);
