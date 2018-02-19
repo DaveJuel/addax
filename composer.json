@@ -1,4 +1,15 @@
 {
+     "name": "Addax",
+     "version": "0.1.0",
+     "description":"Content Management",
+     "authors": [
+        {
+            "name": "David NIWEWE",
+            "email": "davejuelz@gmail.com",
+            "homepage": "https://www.addax.herokuapp.com",
+            "role": "Developer"
+        }
+    ],
   "require": {
     "ext-mysql": "*"
   },
