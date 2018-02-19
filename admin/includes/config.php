@@ -16,6 +16,6 @@ if (isset($url)&&isset($url["host"])&&isset($url["user"])) {
     $host = "localhost";
     $db = "addax";
     $db_user = "root";
-    $pass_phrase = "pesadev123";
+    $pass_phrase = "Rugamba@Beast101";
 }
 

@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 29, 2017 at 06:11 PM
--- Server version: 5.7.20-0ubuntu0.16.04.1
--- PHP Version: 7.0.22-0ubuntu0.16.04.1
+-- Generation Time: Feb 19, 2018 at 05:52 PM
+-- Server version: 5.7.21-0ubuntu0.16.04.1
+-- PHP Version: 7.0.25-0ubuntu0.16.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -41,7 +41,7 @@ CREATE TABLE `credentials` (
 --
 
 INSERT INTO `credentials` (`id`, `user`, `username`, `password`, `type`, `last_log`, `status`) VALUES
-(3, 3, 'admin', '098f6bcd4621d373cade4e832627b4f6', 'administrator', '30-09-2016 10:09:04', 1);
+(3, 3, 'admin', '098f6bcd4621d373cade4e832627b4f6', '0', '30-09-2016 10:09:04', 1);
 
 -- --------------------------------------------------------
 
