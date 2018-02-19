@@ -1,48 +1,77 @@
-function setCountryCode(obj){
-    var element=document.getElementById("phone");
-    var countryStringDetails=obj.value;
-    var countrySplitDetails=countryStringDetails.split("|");
-   element.value=countrySplitDetails[0];
-}
+/*
+ * Javascript to interact with the back interface
+ */
+/*
+ * TODO: Handle all buttons.
+ */
+/*
+ * ============ LOGIN ===============
+ */
+$("#login-form").on('submit', function (e) {
+    e.preventDefault();
+    //Get input field values from HTML form
+    var username = $("input[name=log_username]").val();
+    var password = $("input[name=log_password]").val();
 
-//CHECK THE PHONE
-function checkPhone() {
-    var phone = document.getElementById("phone").value;
-    if (phone != "") {
-        document.getElementById("status").innerHTML = "Checking phone number...";
-        var url = "../includes/interface.php?action=check_phone&phone=" + phone;
-        callback(url, textShow);
-    }
-}
-
-//CHECK USERNAME
-function checkUsername() {
-    var username = document.getElementById("username").value;
-    if (username != "") {
-        document.getElementById("status").innerHTML = "Checking...";
-        var url = "../includes/interface.php?action=check_username&username=" + username;
-        callback(url, textShow);
-    }
-}
-
-//MESSAGE DISPLAY
-function textShow(xmlhttp) {
-    var result = xmlhttp.responseText
-    document.getElementById("status").innerHTML = result;
-}
-
-function callback(url, textShow) {
-    var xmlhttp;
-    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {// code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            textShow(xmlhttp);
-        }
+    //Data to be sent to server
+    var post_data;
+    var output;
+    post_data = {
+        'action': "Login",
+        'log_username': username,
+        'log_password': password
     };
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
-}
+
+    //Ajax post data to server
+    $.post('../includes/interface.php', post_data, function (response) {
+//Response server message
+        if (response.type == 'error') {
+            output = '<div class="notification error"><span class="notification-icon"><i class="fa fa-exclamation" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+        } else if (response.type == "success") {
+            window.location.href = "home.php";
+        } else {
+            output = '<div class="notification success"><span class="notification-icon"><i class="fa fa-check" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+            //If success clear inputs
+            $("input, textarea").val('');
+            $('select').val('');
+            $('select').val('').selectpicker('refresh');
+        }
+        $("#notification").html(output);
+    }, 'json');
+});
+//END LOGIN-------------------------------
+
+/*
+ * ============= UNLOCK ==================
+ */
+$("#unlock-form").on('submit', function (e) {
+    e.preventDefault();
+    //Get input field values from HTML form
+    var password = $("input[name=password]").val();
+
+    //Data to be sent to server
+    var post_data;
+    var output;
+    post_data = {
+        'action': "Unlock",
+        'password': password
+    };
+
+    //Ajax post data to server
+    $.post('../includes/interface.php', post_data, function (response) {
+//Response server message
+        if (response.type == 'error') {
+            output = '<div class="notification error"><span class="notification-icon"><i class="fa fa-exclamation" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+        } else if (response.type == "success") {
+            window.location.href = "home.php";
+        } else {
+            output = '<div class="notification success"><span class="notification-icon"><i class="fa fa-check" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+            //If success clear inputs
+            $("input, textarea").val('');
+            $('select').val('');
+            $('select').val('').selectpicker('refresh');
+        }
+        $("#notification").html(output);
+    }, 'json');
+});
+//END UNLOCK------------------------

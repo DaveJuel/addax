@@ -13,7 +13,8 @@ require 'rb.php';
 require 'config.php';
 R::setup("mysql:host=$host;dbname=$db", "$db_user", "$pass_phrase");
 $main = new main();
-$main->dbname=$db;
+$main->dbname = $db;
+
 class UIfeeders {
 
     public $instance;
@@ -158,16 +159,16 @@ class main extends UIfeeders {
          */
         switch ($status) {
             case 0:
-                $feedback = "<span class='alert alert-danger'>" . $text . "</span>";
+                $feedback = json_encode(array('type' => 'error', 'text' => $text));
                 break;
             case 1:
-                $feedback = "<span class='alert alert-success'>" . $text . "</span>";
+                $feedback = json_encode(array('type' => 'success', 'text' => $text));
                 break;
             case 3:
-                $feedback = "<span class='alert alert-info'>" . $text . "</span>";
+                $feedback = json_encode(array('type' => 'message', 'text' => $text));
                 break;
             default:
-                $feedback = "";
+                $feedback = json_encode(array('type' => 'error', 'text' => "No response found"));
                 break;
         }
         return $feedback;
@@ -1116,16 +1117,17 @@ class user extends main {
                 try {
                     R::exec("UPDATE credentials SET last_login = now() WHERE id = '$db_id' LIMIT 1");
                 } catch (Exception $e) {
-                    
+                    error_log("ERROR: Unable to login" . $e);
                 }
                 $this->status = $this->feedbackFormat(1, "Authentication verified");
-                header("location:../views/home.php");
+                //header("location:../views/home.php");
             } else {
                 $this->status = $this->feedbackFormat(0, "Authentication not verified");
-            }
+            }           
         } catch (Exception $e) {
             $this->status = $this->feedbackFormat(0, "Login error");
         }
+        die($this->status);
     }
 
     /**
@@ -2251,7 +2253,7 @@ class Sender {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $contents = curl_exec($ch);
         if (curl_errno($ch)) {
-            error_log("SEND SMS CURL:". curl_error($ch));            
+            error_log("SEND SMS CURL:" . curl_error($ch));
             $contents = '';
         } else {
             curl_close($ch);

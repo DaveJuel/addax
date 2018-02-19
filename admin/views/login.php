@@ -19,7 +19,7 @@ $title = "Login";
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                            <form method="post" id="login-form">
                                 <div class="form-group">
                                     <input type="text" name="log_username" class="form-control" placeholder="Email" required>
                                 </div>
@@ -27,7 +27,7 @@ $title = "Login";
                                     <input type="password" name="log_password" class="form-control" placeholder="Password" required>
                                 </div>
                                 <input type="submit" class="btn btn-success btn-block" name="action" value="Login">
-                                <p class="display-block text-center m-t-md text-sm"><?php echo $user->status; ?></p>
+                                <p id="notification" class="display-block text-center m-t-md text-sm"></p>
                                 <p class="text-center m-t-xs text-sm">Do not have an account?</p>
                                 <a href="register.php" class="btn btn-default btn-block m-t-md">Create an account</a>
                             </form>
