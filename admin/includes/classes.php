@@ -1516,6 +1516,7 @@ class message extends main {
             $this->status = $this->feedbackFormat(0, "Unable to post message!");
             error_log("ERROR(web:postContactMessage)" + $e);
         }
+        die($this->status);
     }
 
     /**

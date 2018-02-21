@@ -105,7 +105,7 @@ switch ($action) {
             $main->status = $main->feedbackFormat(0, "ERROR: Form data not fetched!");
         }
         break;
-    case 'Send message' :
+    case 'send_message' :
         $sender = $_REQUEST ['name'];
         $email = $_REQUEST ['email'];
         $messageTXT = $_REQUEST ['message'];

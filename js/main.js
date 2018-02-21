@@ -782,29 +782,26 @@
         });
 
         /*========== CONTACT FORM ==========*/
-        $("#contact-form, #contact-form-page").on('submit', function (e) {
+        $("#contact-form").on('submit', function (e) {
             e.preventDefault();
 
             //Get input field values from HTML form
-            var user_name = $("input[name=name]").val();
-            var user_phone = $("input[name=phone]").val();
-            var user_email = $("input[name=email]").val();
-            var user_subject = $("input[name=subject]").val();
+            var user_name = $("input[name=name]").val();            
+            var user_email = $("input[name=email]").val();            
             var user_message = $("textarea[name=message]").val();
 
             //Data to be sent to server
             var post_data;
             var output;
             post_data = {
-                'user_name': user_name,
-                'user_email': user_email,
-                'user_message': user_message,
-                'user_phone': user_phone,
-                'user_subject': user_subject
+                'action':"send_message",
+                'name': user_name,
+                'email': user_email,
+                'message': user_message                
             };
 
             //Ajax post data to server
-            $.post('email/email.php', post_data, function (response) {
+            $.post('../admin/includes/interface.php', post_data, function (response) {
 
                 //Response server message
                 if (response.type == 'error') {

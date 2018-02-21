@@ -56,7 +56,7 @@ ob_start();
                         </div>
                     </div>
                 </div>
-                <form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
+                <form method="post" id="contact-form">
                     <div id="contact-result"></div>
                     <div class="form-group">
                         <input class="form-control" name="name" placeholder="Your Name" type="text">
@@ -67,8 +67,7 @@ ob_start();
                     <div class="form-group">
                         <textarea class="form-control" name="message" placeholder="Your Message"></textarea>
                     </div>
-                    <input class="button btn_lg btn_blue btn_full upper" type="submit" name="action" value="Send message">
-                    <?php echo $web->status; ?>
+                    <button class="button btn_lg btn_blue btn_full upper" type="submit">Send message</button>          
                 </form>
             </div>
         </div>
