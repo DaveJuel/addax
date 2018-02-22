@@ -19,7 +19,7 @@ After cloning this project to your desired directory[Windows: C:~/xampp/htdocs ,
 * Configure the database  
 -> In DB management app (eg:phpmyadmin, workbench,...), create a database.   
 -> Import the database(addax.sql) from Addax root folder, to your newly created database.  
--> Go into ~/addax/includes and open file classes.php.  
+-> Go into ~/addax/admin/includes and open file 'config.php' change your local connection values respective to your settings.
 -> Change to database connection respective to your mysql configurations on line 9.  
 
 * Run the application  
@@ -39,4 +39,4 @@ There you go, every thing done well.
 ### Who do I talk to? ###  
 In case you need help!  
   
-* David NIWEWE: +250788353869  
+* David NIWEWE[phone:+250788353869 , email:davejuelz@gmail.com ]
