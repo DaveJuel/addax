@@ -998,7 +998,7 @@ class user extends main {
                     $names = $users[$row]['fname'] . " " . $users[$row]['lname'];
                     $email = $users[$row]['email'];
                     $tel = $users[$row]['phone'];
-                    $type = $users[$row]['type'];
+                    $type = $this->userType[$users[$row]['type']];
                     $tableContent[$row] = array($userId, $rowNumber, $names, $email, $tel, $type);
                 }
                 $this->displayTable($header, $tableContent, null);

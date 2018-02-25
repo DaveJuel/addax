@@ -46,8 +46,8 @@ require '../includes/interface.php';
             <div class="input-group">
                 <span class="input-group-addon">User type</span>
                 <select name="add_user_type" class="form-control">
-                    <option value="administrator">Administrator</option>
-                    <option value="editor">Editor</option>                    
+                    <option value="0">Administrator</option>
+                    <option value="1">Editor</option>                    
                 </select>
             </div>
         </div>        

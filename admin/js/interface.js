@@ -90,7 +90,7 @@ $("#add-user-form").on('submit', function (e) {
     var email=$("input[name=add_user_email]").val();
     var phone=$("input[name=add_user_tel]").val();
     var address=$("input[name=add_user_address]").val();
-    var userType=$("input[name=add_user_type]").val();
+    var userType=$("select[name=add_user_type]").val();
     var username=$("input[name=add_user_username]").val();
     var password=$("input[name=add_user_password]").val();
     var confirmPassword=$("input[name=add_user_password_confirmed]").val();

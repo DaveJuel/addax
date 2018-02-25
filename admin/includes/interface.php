@@ -29,6 +29,7 @@ switch ($action) {
         $response = $user->login($_SESSION['username'], $password);
         break;
     case 'add_user':
+        $valid=true;
         $fname = $_REQUEST['fname'];
         $lname = $_REQUEST['lname'];
         $oname = $_REQUEST['oname'];
@@ -40,11 +41,25 @@ switch ($action) {
         $username = $_REQUEST['username'];
         $type = $_REQUEST['user_type'];
         //checking the registering a new user
-        if ($password == $cpassword) {
-            $user->add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type);            
-        } else {
-            $user->status = $user->feedbackFormat(0, "Password not the same!");
+        if(empty($fname)||empty($lname)||empty($email)){
+            $user->status = $user->feedbackFormat(0, "Missing input!");
+            $valid=false;
         }
+        if(empty($username)){
+            $user->status = $user->feedbackFormat(0, "Missing username!");
+            $valid=false;  
+        }
+        if($cpassword!=$password){
+            $user->status = $user->feedbackFormat(0, "Password do not match!");
+            $valid=false; 
+        }
+        if(empty($type)){
+            $user->status = $user->feedbackFormat(0, "User type not defined!");
+            $valid=false; 
+        }
+        if ($valid) {
+            $user->add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type);            
+        } 
         die($user->status);
         break;
     case 'Add subject':
