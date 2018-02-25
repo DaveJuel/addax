@@ -1008,12 +1008,18 @@ class user extends main {
         }
     }
 
-    //add the user
+    /**
+     * <h1>add</h1>
+     * <p>Adding the user</p>
+     * @param $fname the name of the user
+     * @param $lname the last name of the user 
+     * @param $oname Other name of the user
+     */
     public function add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type) {
         if ($this->isValid($username)) {
             //saving user credentials
             try {
-//saving user details
+            //saving user details
                 $user_details = R::dispense("user");
                 $user_details->fname = $fname;
                 $user_details->lname = $lname;

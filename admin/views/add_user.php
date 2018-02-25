@@ -5,7 +5,7 @@ require '../includes/interface.php';
 <?php ob_start(); ?>
 <!--Adding user form-->
 <div class="col-md-8">
-    <form role="form" method="post"  action="<?php echo $_SERVER['PHP_SELF'] ?>">
+    <form role="form" method="post" id="add-user-form" >
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon">First name</span>
@@ -71,11 +71,11 @@ require '../includes/interface.php';
         </div>		
         <div class="form-group">
             <div class="input-group">
-                <input type="submit" class="btn btn-info" name="action" value="Add user"/>
+                <input type="submit" class="btn btn-success btn-block" name="action" value="Add user">
             </div>
         </div>
         <div class="form-group">
-            <span><?php echo $user->status; ?></span>
+            <span id="notification"></span>
         </div>
     </form>
 </div>

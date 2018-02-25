@@ -28,23 +28,24 @@ switch ($action) {
         $password = $_REQUEST['password'];
         $response = $user->login($_SESSION['username'], $password);
         break;
-    case 'Add user':
-        $fname = $_REQUEST['add_user_fname'];
-        $lname = $_REQUEST['add_user_lname'];
-        $oname = $_REQUEST['add_user_oname'];
-        $tel = $_REQUEST['add_user_tel'];
-        $email = $_REQUEST['add_user_email'];
-        $address = $_REQUEST['add_user_address'];
-        $password = $_REQUEST['add_user_password'];
-        $cpassword = $_REQUEST['add_user_password'];
-        $username = $_REQUEST['add_user_username'];
-        $type = $_REQUEST['add_user_type'];
+    case 'add_user':
+        $fname = $_REQUEST['fname'];
+        $lname = $_REQUEST['lname'];
+        $oname = $_REQUEST['oname'];
+        $tel = $_REQUEST['phone'];
+        $email = $_REQUEST['email'];
+        $address = $_REQUEST['address'];
+        $password = $_REQUEST['password'];
+        $cpassword = $_REQUEST['confirm_password'];
+        $username = $_REQUEST['username'];
+        $type = $_REQUEST['user_type'];
         //checking the registering a new user
         if ($password == $cpassword) {
-            $user->add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type);
+            $user->add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type);            
         } else {
             $user->status = $user->feedbackFormat(0, "Password not the same!");
         }
+        die($user->status);
         break;
     case 'Add subject':
         $title = $_REQUEST['subject_title'];

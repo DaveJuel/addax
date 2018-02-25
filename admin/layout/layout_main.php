@@ -120,5 +120,6 @@ if ($login_status != TRUE) {
         <script src="../js/pages/table-data.js"></script>
         <script src="../plugins/datatables/js/jquery.datatables.min.js"></script>  
         <script src="../js/custom.js"></script>
+        <script src="../js/interface.js"></script>
     </body>
 </html>
