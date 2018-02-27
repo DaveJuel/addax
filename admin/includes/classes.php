@@ -955,28 +955,37 @@ class user extends main {
         1 => "editor",
         2 => "visitor"
     ];
+    public $count;
     public $userlist = [];
 
     function __construct() {
-        $this->fetch();
+        $this->count();
     }
 
     /**
-     * <h1>count</h1>
+     * <h1>fetch</h1>
      * <p>Counting the user of the system</p>
      */
-    public function fetch() {
+    public function count() {
         $users = [];
-        $userType = $this->userType;
-        for ($count = 0; $count < count($userType); $count++) {
-            $type = $userType[$count];
-            try {
-                $users[$type] = R::getAll("SELECT * FROM credentials WHERE type='$count'");
-            } catch (Exception $e) {
-                error_log("USER(fetch)" . $e);
+        $userTypeList = $this->userType;
+        $loggedInType=$this->getUserType();
+        if($loggedInType=="administrator"){
+           try{
+              $users=R::getAll("SELECT * FROM credentials");
+              $this->count=count($users);
+           }catch(Exception $e){
+                error_log("ERROR(USER:COUNT):".$e);
+           }
+        }else{
+            try{
+             $type=array_search($loggedInType,$this->userType);             
+             $users=R::getAll("SELECT * FROM credentials WHERE type='$type'");
+             $this->count=count($users);
+            }catch(Exception $e){
+                 error_log("ERROR(USER:COUNT):".$e);
             }
         }
-        $this->userlist = $users;
     }
 
     //getting the user
@@ -1053,7 +1062,12 @@ class user extends main {
         }
     }
 
-    //validate username
+    /**
+    *<h1>isValid</h1>
+    *<p>This function validates id the username is valid for registration</p>
+    * @param $username The user name to validate.
+    * @return Boolean
+    */
     private function isValid($username) {
         $status = true;
         try {
@@ -1081,7 +1095,11 @@ class user extends main {
         }
     }
 
-    //checking if user is logged in
+    /**
+    * <h1>checkLogin</h1>
+    * <p>This function verifies if the user is logged in</p>
+    * @return Boolean
+    */
     public function checkLogin() {
         $user_ok = false;
         $user_id = "";
@@ -1106,7 +1124,12 @@ class user extends main {
         return $user_ok;
     }
 
-    //login user
+    /**
+    *<h1>login</h1>
+    *<p>This is the function to login the user</p>
+    * @param $username the username of the user
+    * @param $password the password of the user 
+    */
     public function login($username, $password) {
         $password = md5($password);
         try {
@@ -2058,13 +2081,14 @@ class dashboard {
         $userObj = new user();
         $messageObj = new message();
         $notificationObj = new notification();
+        $userObj=new user();
         $userType = $userObj->getUserType();
         if ($userType == "administrator") {
             $titleList = ["Users", "Notifications", "Messages", "Log"];
-            $countList = [89, $notificationObj->count, $messageObj->count, 521];
+            $countList = [$userObj->count, $notificationObj->count, $messageObj->count, "-"];
         } else {
-            $countList = ["-", "-", "-", "-"];
-            $titleList = ["N/A", "N/A", "N/A", "N/A"];
+            $titleList = ["Users", "Notifications", "Messages", "N/A"];
+            $countList = [$userObj->count, $notificationObj->count, $messageObj->count, "-"];            
         }
         $this->number = $countList;
         $this->title = $titleList;
