@@ -11,10 +11,9 @@ session_start();
  */
 require 'rb.php';
 require 'config.php';
-R::setup("mysql:host=$host;dbname=$db", "$db_user", "$pass_phrase");
-$main = new main();
-$main->dbname = $db;
-
+$connection=new connection();
+R::setup("mysql:host=$connection->host;dbname=$connection->db", "$connection->db_user", "$connection->pass_phrase");
+$main=new main();
 class UIfeeders {
 
     public $instance;
@@ -141,9 +140,13 @@ class main extends UIfeeders {
 
     public $status;
     public $appName = "Addax";
-    public $author = "David NIWEWE";
+    public $author = "David NIWEWE";    
     public $dbname = "";
 
+    function __construct(){
+        $connection=new connection();
+        $this->dbname=$connection->db;
+    }
     /**
      * <h1>feedbackFormat</h1>
      * <p>This method is to format for performed action</p>
