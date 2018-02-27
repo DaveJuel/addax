@@ -11,14 +11,10 @@
         }
     ],
   "require": {
-    "ext-mysql": "*"
-  },
-   "require": {
-      "ext-gettext": "*"
-    },
-    "require":{
-        "ext-mbstring":"*"
-    },
+    "ext-mysql": "*",
+    "ext-gettext": "*",
+    "ext-mbstring":"*"
+  },  
    "require-dev": {
       "heroku/heroku-buildpack-php": "*"
    }
