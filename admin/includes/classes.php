@@ -2473,7 +2473,7 @@ class file_handler extends main {
                 $ext = explode(".", $db_file_name);
                 $fileExt = end($ext);
                 $taget_file = rand(100000000000, 999999999999) . "." . $fileExt;
-                $path = "../images/uploaded/" . $taget_file;
+                $path = "../../images/uploaded/" . $taget_file;
                 if (move_uploaded_file($temp_name, $path)) {
                     try {
                         $fileDetails = R::dispense("image");
