@@ -10,6 +10,7 @@ $dashboard = new dashboard ();
 $message = new message ();
 $notification = new notification ();
 $smsKey = new sms ();
+$fileHandler = new file_handler();
 $action = null;
 //getting caller details
 if (isset($_REQUEST['action'])) {
@@ -152,6 +153,11 @@ switch ($action) {
         $field = $_REQUEST['field'];
         $main->feedModal($instance, $field);
         break;
+    case'add_file':
+        $file = $_FILES['image'];
+        $result = $fileHandler->upload($file);
+        echo $result;
+    break;    
     default:
         break;
 }

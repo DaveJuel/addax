@@ -9,8 +9,10 @@ function notifier(status, text, holder) {
         holder.innerHTML = "<span class='alert alert-danger'>" + text + "</span>";
     } else if (status == 1) {
         holder.innerHTML = "<span class='alert alert-success'>" + text + "</span>";
-    } else {
-        holder.innerHTML = "<span class='alert alert-info'>" + text + "<i class='fa fa-spinner fa-pulse'></i></span>";
+    } else if(status==2){
+        holder.innerHTML = "<span class='alert alert-info'><span class='fa fa-spinner fa-pulse'></span>"+text+"</span>";
+    }else {
+        holder.innerHTML = "<span class='alert alert-info'>" + text + "</span>";
     }
 }
 
@@ -159,4 +161,46 @@ function feedModal() {
         trigger.disabled(true);
     }
 
+}
+
+function uploadList(obj) {
+    
+    var file = obj.files[0];
+    if (!file) {
+       notifier(0,"No file",document.getElementById("upload_status"));
+    } else {
+        var fd = new FormData();
+        fd.append("image", file);
+        var aj = new XMLHttpRequest();
+        aj.upload.addEventListener("progress", progressHandler, false);
+        aj.addEventListener("load", completeHandler, false);
+        aj.addEventListener("error", errorHandler, false);
+        aj.addEventListener("abort", abortHandler, false);
+        aj.open("POST", "../includes/interface.php?action=add_file");
+        aj.send(fd);
+    }
+}
+
+
+function progressHandler(event) {
+  notifier(2, "Uploading ...",document.getElementById("status"));
+}
+
+function completeHandler(event) {
+    var response =JSON.parse(event.target.responseText);
+    if (response.type=="error") {        
+        notifier(0,response.text,document.getElementById("status"));        
+    }else if(response.type=="success"){
+        notifier(1,response.text,document.getElementById("status"));
+    } else {
+        notifier(3,response.text,document.getElementById("status"));
+    }   
+}
+
+function errorHandler(event) {
+    notifier(0,"Upload failed",document.getElementById("status"));
+}
+
+function abortHandler(event) {
+    notifier(0,"Upload aborted",document.getElementById("upload_status"));
 }

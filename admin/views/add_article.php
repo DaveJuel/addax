@@ -9,6 +9,7 @@ require '../includes/interface.php';
     $main->formBuilder($_REQUEST['article'],"add");
     echo $main->status;
     ?>
+    <span id="status"></span>
 </div>    
 <?php $content = ob_get_clean(); ?>
 <?php include '../layout/layout_main.php'; ?>

@@ -681,7 +681,7 @@ class main extends UIfeeders {
                     $input = "<input type='date' name='$name' class='form-control'$holder='$value'>";
                     break;
                 case 'file':
-                    $input = "<input type='file' name='$name' class='form-control'$holder='$value'>";
+                    $input = "<input type='file' name='$name' onfocusout='uploadList(this)' class='form-control'$holder='$value'>";
                     break;
                 case 'long text':
                     $input = "<textarea class='form-control' name='$name'>$value</textarea>";
@@ -2326,6 +2326,79 @@ class Sender {
             $response = $this->send_sms_curl();
         }
         return $response;
+    }
+
+}
+/*
+* Handling all upload process
+*/
+class file_handler extends main {
+
+    public $status = "";
+    public $fileId="";
+
+    /**
+     * <h1>upload</h1>
+     * Uploading the and image
+     * @param $file the name of the image to be uploaded
+     * @param $category The category in which the image can be described in
+     */    
+    public function upload($file) {
+        //GETTING THE PARAMETERS TO READ
+        //PHONE => DEFINE COLUMN TO READ         
+        $db_file_name = basename($file['name']);
+        $ext = explode(".", $db_file_name);
+        $fileExt = end($ext);
+        if ($fileExt == "jpeg" || $fileExt == "png" || $fileExt == "jpg") {
+
+            $upload_errors = array(
+                // http://www.php.net/manual/en/features.file-upload.errors.php
+
+                UPLOAD_ERR_OK => "No errors.",
+                UPLOAD_ERR_INI_SIZE => "Larger than upload_max_filesize.",
+                UPLOAD_ERR_FORM_SIZE => "Larger than form MAX_FILE_SIZE.",
+                UPLOAD_ERR_PARTIAL => "Partial upload.",
+                UPLOAD_ERR_NO_FILE => "No file.",
+                UPLOAD_ERR_NO_TMP_DIR => "No temporary directory.",
+                UPLOAD_ERR_CANT_WRITE => "Can't write to disk.",
+                UPLOAD_ERR_EXTENSION => "File upload stopped by extension."
+            );
+
+            if (!$file || empty($file) || !is_array($file)) {
+                $this->status = $this->feedbackFormat(1, "No file was attached");
+            } else if ($file["error"] != 0) {
+                $this->status = $this->feedbackFormat(0, $upload_errors[$file["error"]]);
+            } else if ($file["error"] == 0) {
+                $size = $file['size'];
+                $type = $file['type'];
+                $temp_name = $file['tmp_name'];
+                $db_file_name = basename($file['name']);
+                $ext = explode(".", $db_file_name);
+                $fileExt = end($ext);
+                $taget_file = rand(100000000000, 999999999999) . "." . $fileExt;
+                $path = "../images/uploaded/" . $taget_file;
+                if (move_uploaded_file($temp_name, $path)) {
+                    try {
+                        $fileDetails = R::dispense("image");
+                        $fileDetails->name = $taget_file;
+                        $fileDetails->path = $path;
+                        $fileDetails->added_on = date("Y-m-d h:m:s");
+                        $fileDetails->added_by = $_SESSION['user_id'];
+                        $fileDetails->status = false;
+                        $fileId = R::store($fileDetails);
+                        $this->status = json_encode(array('id'=>$fileId,'type' => 'success', 'text' => "Upload successful"));//$this->feedbackFormat(1, "Image added");
+                    } catch (Exception $e) {
+                        $this->status = $this->feedbackFormat(0, "Image not added");
+                        error_log($e);
+                    }
+                } else {
+                    $this->status = $this->feedbackFormat(0, "Failed to add file");
+                }
+            }
+        } else {
+            $this->status = $this->feedbackFormat(0, "The File is not an image.");
+        }
+        return $this->status;
     }
 
 }
