@@ -191,6 +191,7 @@ function completeHandler(event) {
     if (response.type=="error") {        
         notifier(0,response.text,document.getElementById("status"));        
     }else if(response.type=="success"){
+        document.getElementsByName("image").value=response.filename;
         notifier(1,response.text,document.getElementById("status"));
     } else {
         notifier(3,response.text,document.getElementById("status"));

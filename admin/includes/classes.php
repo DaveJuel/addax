@@ -699,7 +699,7 @@ class main extends UIfeeders
                     $input = "<input type='date' name='$name' class='form-control'$holder='$value'>";
                     break;
                 case 'file':
-                    $input = "<input type='file' name='$name' onfocusout='uploadList(this)' class='form-control'$holder='$value'>";
+                    $input = "<input type='hidden' name='$name' value='' /><input type='file' onfocusout='uploadList(this)' class='form-control'$holder='$value'>";
                     break;
                 case 'long text':
                     $input = "<textarea class='form-control' name='$name'>$value</textarea>";
@@ -2473,7 +2473,11 @@ class file_handler extends main {
                 $ext = explode(".", $db_file_name);
                 $fileExt = end($ext);
                 $taget_file = rand(100000000000, 999999999999) . "." . $fileExt;
-                $path = "../../images/uploaded/" . $taget_file;
+                $directory="../../images/uploaded/";
+                if(!is_dir($directory)){
+                    mkdir($directory,0777);
+                }
+                $path = $directory . $taget_file;
                 if (move_uploaded_file($temp_name, $path)) {
                     try {
                         $fileDetails = R::dispense("image");
