@@ -107,6 +107,10 @@ switch ($action) {
             $subject->status = $subject->feedbackFormat(0, "Fill all required fields!");
         }
         break;
+    case 'delete_subject':
+        $subjectId=$_REQUEST["subject_id"];
+        $subject->delete($subjectId);
+        break;    
     case 'Save':
         $values = array();
         $articleId = $_REQUEST['article'];

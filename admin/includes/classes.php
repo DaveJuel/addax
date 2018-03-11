@@ -1383,7 +1383,7 @@ class subject extends main
     //checking the existence of a subject
     public function isValid($title)
     {
-        $status = false;
+        $status = true;
         try {
             $check = R::getCol("SELECT id FROM subject WHERE title='$title'");
             if (sizeof($check) != 0) {
@@ -1424,6 +1424,7 @@ class subject extends main
             $subjectList = R::getAll("SELECT title,created_by,created_on,last_update FROM subject ORDER BY created_on DESC ");
             for ($count = 0; $count < count($subjectList); $count++) {
                 $title = $subjectList[$count]['title'];
+                //TODO: Get the creator name
                 $createdBy = $subjectList[$count]['created_by'];
                 $createdOn = $subjectList[$count]['created_on'];
                 $lastUpdate = $subjectList[$count]['last_update'];
@@ -1433,6 +1434,32 @@ class subject extends main
         } catch (Exception $e) {
             error_log("ERROR (getList):" . $e);
         }
+    }
+
+    /**
+     * delete
+     * This method deleted the subject specified
+    */
+    public function delete($subjectId){
+        if(isset($subjectId)){
+          try{
+             $subjectTitle=R::getCell("SELECT title FROM subject WHERE id='$subjectId'");
+             if(isset($subjectTitle)) $tableDropped=R::exec("DROP TABLE $subjectTitle");
+             if($tableDropped)R::exec("DELETE FROM subject WHERE id='$subjectId'");
+             $subjectId=$this->getId($subjectTitle);
+             if(!isset($subjectId)){
+                $this->status=$this->feedbackFormat(1,"Subject deleted successfully");
+             }else{
+                $this-> status=$this->feedbackFormat(0,"Unable to delete subject");
+             }
+          }catch(Exception $e){
+              error_log("SUBJECT:DELETE".$e);
+             $this->status=$this->feedbackFormat(0,"Error occured");
+          }
+        }else{
+         $this->status=$this->feedbackFormat(0,"Subject not specified");
+        }
+        die($this->status);
     }
 
 }
