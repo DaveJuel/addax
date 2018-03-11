@@ -59,13 +59,13 @@ ob_start();
                 <form method="post" id="contact-form">
                     <div id="contact-result"></div>
                     <div class="form-group">
-                        <input class="form-control" name="name" placeholder="Your Name" type="text">
+                        <input class="form-control" required name="name" placeholder="Your Name" type="text">
                     </div>
                     <div class="form-group">
-                        <input class="form-control" name="email" type="email" placeholder="Your Email Address">
+                        <input class="form-control" required name="email" type="email" placeholder="Your Email Address">
                     </div>
                     <div class="form-group">
-                        <textarea class="form-control" name="message" placeholder="Your Message"></textarea>
+                        <textarea class="form-control" required name="message" placeholder="Your Message"></textarea>
                     </div>
                     <button class="button btn_lg btn_blue btn_full upper" type="submit">Send message</button>          
                 </form>

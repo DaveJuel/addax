@@ -1589,6 +1589,18 @@ class message extends main
         } else {
             $lname = $fname = $sender;
         }
+        if(!isset($sender)){
+            $this->status = $this->feedbackFormat(0, "Missing sender name!");
+            die($this->status);
+        } 
+        if(!isset($email)){
+            $this->status = $this->feedbackFormat(0, "Missing sender email!");
+            die($this->status);
+        }
+        if(!isset($message)){
+            $this->status = $this->feedbackFormat(0, "You need to type your message");
+            die($this->status);
+        }
         /*
          * Create user before sending message
          */
@@ -1604,7 +1616,7 @@ class message extends main
             $messageQR->created_on = date("Y-m-d h:m:s");
             $messageQR->status = 0;
             R::store($messageQR);
-            $this->status = $this->feedbackFormat(1, "Message sent successful!");
+            $this->status = $this->feedbackFormat(1, "Message sent successfully!");
         } catch (Exception $e) {
             $this->status = $this->feedbackFormat(0, "Unable to post message!");
             error_log("ERROR(web:postContactMessage)"+$e);
