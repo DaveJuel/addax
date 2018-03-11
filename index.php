@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="refresh" content="0;url=views/home.php">
-		<title>ADDAX |Start </title>
+		<title>Addax |Start </title>
 		<script language="javascript">
 			window.location.href = "views/home.php"
 		</script>
