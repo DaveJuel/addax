@@ -26,7 +26,7 @@ $("#login-form").on('submit', function (e) {
 
     //Ajax post data to server
     $.post('../includes/interface.php', post_data, function (response) {
-//Response server message
+        //Response server message
         if (response.type == 'error') {
             output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.text + '</span></div>';
         } else if (response.type == "success") {
@@ -61,7 +61,7 @@ $("#unlock-form").on('submit', function (e) {
 
     //Ajax post data to server
     $.post('../includes/interface.php', post_data, function (response) {
-    //Response server message
+        //Response server message
         if (response.type == 'error') {
             output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
         } else if (response.type == "success") {
@@ -84,16 +84,16 @@ $("#unlock-form").on('submit', function (e) {
 $("#add-user-form").on('submit', function (e) {
     e.preventDefault();
     //Get input field values from HTML form
-    var fname=$("input[name=add_user_fname]").val();
-    var lname=$("input[name=add_user_lname]").val();
-    var oname=$("input[name=add_user_oname]").val();
-    var email=$("input[name=add_user_email]").val();
-    var phone=$("input[name=add_user_tel]").val();
-    var address=$("input[name=add_user_address]").val();
-    var userType=$("select[name=add_user_type]").val();
-    var username=$("input[name=add_user_username]").val();
-    var password=$("input[name=add_user_password]").val();
-    var confirmPassword=$("input[name=add_user_password_confirmed]").val();
+    var fname = $("input[name=add_user_fname]").val();
+    var lname = $("input[name=add_user_lname]").val();
+    var oname = $("input[name=add_user_oname]").val();
+    var email = $("input[name=add_user_email]").val();
+    var phone = $("input[name=add_user_tel]").val();
+    var address = $("input[name=add_user_address]").val();
+    var userType = $("select[name=add_user_type]").val();
+    var username = $("input[name=add_user_username]").val();
+    var password = $("input[name=add_user_password]").val();
+    var confirmPassword = $("input[name=add_user_password_confirmed]").val();
 
     //Data to be sent to server
     var post_data;
@@ -114,7 +114,7 @@ $("#add-user-form").on('submit', function (e) {
 
     //Ajax post data to server
     $.post('../includes/interface.php', post_data, function (response) {
-    //Response server message
+        //Response server message
         if (response.type == 'error') {
             output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
         } else if (response.type == "success") {
@@ -130,3 +130,49 @@ $("#add-user-form").on('submit', function (e) {
     }, 'json');
 });
 //END ADD USER------------------------
+
+//REGISTER
+$("register-form").on("submit", function (e) {
+    e.preventDefault();
+    var fname = $("input[name=register_fname]").val();
+    var lname = $("input[name=register_lname]").val();
+    var email = $("input[name=register_email]").val();
+    var username = $("input[name=register_username]").val();
+    var password = $("input[name=register_password]").val();
+    var confirmPassword = $("input[name=confirm_password]").val();
+
+    //Data to be sent to server
+    var post_data;
+    var output;
+    post_data = {
+        'action': "add_user",
+        'fname': fname,
+        'lname': lname,
+        'oname': oname,
+        'email': email,
+        'phone': "",
+        'address': "",
+        'user_type': 0,
+        'username': username,
+        'password': password,
+        'confirm_password': confirmPassword
+    };
+
+    //Ajax post data to server
+    $.post('../includes/interface.php', post_data, function (response) {
+        //Response server message
+        if (response.type == 'error') {
+            output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+        } else if (response.type == "success") {
+            output = '<div class="alert alert-success"><span class="notification-icon"><i class="glyphicon glyphicon-ok-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+        } else {
+            output = '<div class="alert alert-warning"><span class="notification-icon"><i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
+            //If success clear inputs
+            $("input, textarea").val('');
+            $('select').val('');
+            $('select').val('').selectpicker('refresh');
+        }
+        $("#notification").html(output);
+    }, 'json');
+});
+//END REGISTER -------------

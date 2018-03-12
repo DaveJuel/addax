@@ -6,20 +6,30 @@
         <div class="login-box">
             <a href="login.php" class="logo-name text-lg text-center"><?php echo $main->appName; ?></a> 
             <p class="text-center m-t-md">Create account</p>
-            <form class="m-t-md" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">   
-                <div class="form-group">
-                    <select class="form-control" id="country" onchange="setCountryCode(this)" name="country"  required>
-                        <?php $main->listCountries(); ?>
-                    </select>       
-                </div>   
-                <div class="form-group">
-                    <input type="text" class="form-control" name="phone" id="phone" onblur="checkPhone();" placeholder="phone" required>
-                </div>    
+            <form class="m-t-md" method="post" id="register-form">   
+            <div class="form-group">
+                <input type="text" name="register_fname" class="form-control" placeholder="First name" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="register_lname" class="form-control" placeholder="Last name" required>
+            </div>    
+            <div class="form-group">
+                <input type="text" name="register_email" class="form-control" placeholder="email" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="register_username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="register_password" class="form-control" placeholder="Password" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="confirm_password" class="form-control" placeholder="Repeat password" required>
+            </div>   
                 <label>
                     <input type="checkbox"> Agree the terms and policy
                 </label>
-                <input type="submit" class="btn btn-success btn-block m-t-xs" name="action" value="Sign up">
-                <p class="text-center m-t-xs text-sm" id="status"><?php echo $user->status; ?></p>    
+                <input type="submit" class="btn btn-success btn-block m-t-xs" value="Sign up">
+                <p class="text-center m-t-xs text-sm" id="notification"></p>    
                 <p class="text-center m-t-xs text-sm">Already have an account?</p>
                 <a href="login.php" class="btn btn-default btn-block m-t-xs">Login</a>
             </form>
