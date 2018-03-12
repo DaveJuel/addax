@@ -11,6 +11,7 @@ session_start();
  */
 require 'rb.php';
 require 'config.php';
+require 'sectionFormat.php';
 $connection = new connection();
 R::setup("mysql:host=$connection->host;dbname=$connection->db", "$connection->db_user", "$connection->pass_phrase");
 $main = new main();
@@ -18,13 +19,7 @@ class UIfeeders
 {
 
     public $instance;
-    public $field;
-    public $images = [
-        "../images/defaults/mechanics-2170638_1920.jpg",
-        "../images/defaults/mockup-654585_1280.jpg",
-        "../images/defaults/statistic-1820320_1280.jpg",
-        "../images/defaults/tetris-749690_1920.jpg",
-    ];
+    public $field;   
 
     /**
      * <h1>comboBuilder</h1>
@@ -844,112 +839,6 @@ class main extends UIfeeders
         } catch (Exception $exc) {
             error_log("ERROR(main:getTableColumns)" . $exc);
         }
-    }
-
-    /**
-     * <h1>slideFormat</h1>
-     * <p>Making the web slide format</p>
-     * @param String $bk_source The source of the background image
-     * @param String $title The title of the image
-     * @param String $details description of the slide
-     */
-    public function slideFormat($bk_source, $title, $details)
-    {
-        if (!isset($bk_source)) {
-            $randImage = rand(0, 3);
-            $bk_source = $this->images[$randImage];
-        }
-        echo '<li data-transition="fade">
-                    <!-- MAIN IMAGE -->
-                    <img src="' . $bk_source . '"
-                         alt="Image"
-                         title="slider_bg1-1"
-                         data-bgposition="center center"
-                         data-bgfit="cover"
-                         data-bgrepeat="no-repeat"
-                         data-bgparallax="10"
-                         class="rev-slidebg"
-                         data-no-retina="">';
-        //-- LAYER NR. 1 --
-        echo ' <div class="tp-caption tp-resizeme"
-                         data-x="center"
-                         data-hoffset=""
-                         data-y="middle"
-                         data-voffset="[\'-30\',\'-30\',\'-30\',\'-30\']"
-                         data-responsive_offset="on"
-                         data-fontsize="[\'60\',\'50\',\'40\',\'30\']"
-                         data-lineheight="[\'60\',\'50\',\'40\',\'30\']"
-                         data-whitespace="nowrap"
-                         data-frames=\'[{"delay":1000,"speed":2000,"frame":"0","from":"y:[100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;","mask":"x:0px;y:[100%];s:inherit;e:inherit;","to":"o:1;","ease":"Power2.easeInOut"},{"delay":"wait","speed":500,"frame":"999","to":"auto:auto;","ease":"Power3.easeInOut"}]\'
-                         style="z-index: 5; color: #fff; font-weight: 900;">' . $title . '</div>';
-        //-- LAYER NR. 2 --
-
-        echo '<div class="tp-caption tp-resizeme"
-                         data-x="center"
-                         data-hoffset=""
-                         data-y="middle"
-                         data-voffset="[\'45\',\'45\',\'45\',\'45\']"
-                         data-fontsize="[\'16\', \'16\', \'14\', \'12\']"
-                         data-lineheight="[\'16\', \'16\',\'14\', \'12\']"
-                         data-whitespace="nowrap"
-                         data-transform_idle="o:1;"
-                         data-transform_in="opacity:0;s:300;e:Power2.easeInOut;"
-                         data-transform_out="y:[100%];s:1000;e:Power2.easeInOut;s:1000;e:Power2.easeInOut;"
-                         data-mask_out="x:inherit;y:inherit;s:inherit;e:inherit;"
-                         data-start="3000"
-                         data-splitin="chars"
-                         data-splitout="none"
-                         data-basealign="slide"
-                         data-responsive="off"
-                         data-elementdelay="0.05"
-                         style="z-index: 9; font-weight: 400; color: rgba(255, 255, 255, 0.8); font-family: Raleway;">' . $details . '</div>
-                </li>';
-    }
-
-    //WEB SERVICE DISPLAY
-    public function featureFormat($featureList)
-    {
-        echo '<div class = "col-md-7">'
-            . '<div data-slider-id = "features" id = "features_slider" class = "owl-carousel">';
-        for ($count = 0; $count < count($featureList); $count++) {
-            //image display
-            /*
-            TODO: Need to show image that is related to the feature.
-            */
-            $randImage = rand(0, 3);
-            $image = $this->images[$randImage];
-            $this->showImage($image);
-        }
-        echo '</div>
-        </div>';
-        //description display
-        echo '<div class="col-md-5">
-                <div class="owl-thumbs" data-slider-id="features">';
-        for ($count = 0; $count < count($featureList); $count++) {
-            $title = $featureList[$count][1];
-            $description = $featureList[$count][2];
-            $this->showDescription($title, $description);
-        }
-        echo '</div>
-            </div>';
-    }
-
-    private function showImage($image)
-    {
-        echo '
-        <div><img src = "' . $image . '" class = "img-responsive" alt = "Image"></div>
-        ';
-    }
-
-    private function showDescription($title, $description)
-    {
-        echo '<div class="owl-thumb-item">
-                        <span class="media-left"><i class="flaticon-food"></i></span>
-                        <div class="media-body">
-                            <h5>' . $title . '</h5>
-                            <p>' . $description . '</p>
-                        </div>
-                    </div>';
     }
 
     /*
@@ -2235,6 +2124,7 @@ class web extends main
     public function showContent($title, $formatType, $attributes)
     {
         $subject = new subject();
+        $format=new sectionFormat();
         if (isset($title) && isset($formatType) && isset($attributes)) {
             $content = new content();
             for ($count = 0; $count < count($attributes); $count++) {
@@ -2245,10 +2135,10 @@ class web extends main
                 $contentItem = $contentList[$outer];
                 switch ($formatType) {
                     case 1: //slide
-                        $this->slideFormat($contentItem[1], $contentItem[2], $contentItem[3]);
+                         $format->showSlider($contentItem[1], $contentItem[2], $contentItem[3]);
                         break;
                     case 2: //features
-                        $this->featureFormat($contentList);
+                         $format->showFeature($contentList);
                         break;
                     case 3:
                         /*
@@ -2262,38 +2152,6 @@ class web extends main
             }
         } else {
             error_log("ERROR:Missing content specifications");
-        }
-    }
-
-    //GETTING THE SERVICE
-    public function showService()
-    {
-        try {
-            $image = "../images/defaults/gf.jpeg";
-            $serviceList = R::getAll("SELECT title,category,description FROM service;");
-            $this->featureFormat($serviceList);
-        } catch (Exception $e) {
-            error_log("ERROR(web:showService):" . $e);
-        }
-    }
-
-}
-
-class contentFormat extends main
-{
-
-    //DISPLAY THE SLIDER CONTENT
-    public function slider()
-    {
-        try {
-            $randImage = rand(0, 3);
-            $image = $this->images[$randImage];
-            $slide = R::getAll("SELECT title,description FROM slide");
-            for ($count = 0; $count < count($slide); $count++) {
-
-            }
-        } catch (Exception $e) {
-            error_log("ERROR(content:slider):" . $e);
         }
     }
 
