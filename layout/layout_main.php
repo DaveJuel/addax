@@ -96,7 +96,7 @@
         <script type="text/javascript" src="../js/countUp.min.js"></script>
         <script type="text/javascript" src="../js/jquery.countdown.min.js"></script>
         <script type="text/javascript" src="../js/main.js"></script>
-
+        <script type="text/javascript" src="../js/tawkChat.js"></script>
         <!-- ========== REVOLUTION SLIDER ========== -->
         <script type="text/javascript" src="../revolution/js/jquery.themepunch.tools.min.js"></script>
         <script type="text/javascript" src="../revolution/js/jquery.themepunch.revolution.min.js"></script>

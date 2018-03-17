@@ -1,8 +1,8 @@
  /*================================================
-* Template Name: Zante Hotel - Hotel & Resort HTML Template
-* Version: 1.2
-* Author Name: Jomin Muskaj
-* Author URI: eagle-themes.com
+* App Name: Addax - Content management
+* Version: 1.1.0
+* Author Name: David NIWEWE
+* Author URI: addax.herokuapp.com
 =================================================*/
 
 (function ($) {
@@ -1022,3 +1022,5 @@
 
     });
 })(jQuery);
+
+

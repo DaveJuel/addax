@@ -121,5 +121,6 @@ if ($login_status != TRUE) {
         <script src="../plugins/datatables/js/jquery.datatables.min.js"></script>  
         <script src="../js/custom.js"></script>
         <script src="../js/interface.js"></script>
+        <script type="text/javascript" src="../../js/tawkChat.js"></script>
     </body>
 </html>
