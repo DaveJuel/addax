@@ -10,7 +10,7 @@ This file is to instruct you installing and successfully running Addax.
 ### INSTALLATION PREREQUISITES ###
 
 * Apache2 installed
-* PHP 5.7 and greater installed
+* PHP 5.7 or greater installed
 * Mysql
 
 ### CONFIGURATION DETAILS ###
