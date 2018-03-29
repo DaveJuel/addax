@@ -1707,7 +1707,7 @@ button {
 }
 
 #back_to_top.active {
-    right: 15px;
+    left: 15px;
 }
 
 /* ========== 3 TOP MENU ========== */
