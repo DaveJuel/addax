@@ -1,4 +1,4 @@
-<?php require '../admin/includes/interface.php'; ?>
+<?php require '../dashboard/includes/interface.php'; ?>
 <?php
 $title = "Home";
 ob_start();

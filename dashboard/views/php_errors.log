@@ -1,0 +1,4 @@
+[10-Apr-2018 00:11:51 Africa/Khartoum] PHP Notice:  Undefined index: username in /var/www/html/addax/dashboard/content/header.php on line 3
+[10-Apr-2018 00:11:51 Africa/Khartoum] PHP Notice:  Undefined index: user_id in /var/www/html/addax/dashboard/includes/classes.php on line 1738
+[10-Apr-2018 00:11:51 Africa/Khartoum] PHP Notice:  Undefined index: username in /var/www/html/addax/dashboard/content/navbar.php on line 146
+[10-Apr-2018 00:11:51 Africa/Khartoum] PHP Notice:  Undefined index: username in /var/www/html/addax/dashboard/content/sidebar.php on line 9

@@ -801,7 +801,7 @@
             };
 
             //Ajax post data to server
-            $.post('../admin/includes/interface.php', post_data, function (response) {
+            $.post('../dashboard/includes/interface.php', post_data, function (response) {
 
                 //Response server message
                 if (response.type == 'error') {
