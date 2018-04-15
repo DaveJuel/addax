@@ -18,8 +18,7 @@ class sectionFormat
     public function showSlider($bk_source, $title, $details)
     {
         if (!isset($bk_source)) {
-            $randImage = rand(0, 3);
-            $bk_source = $this->images[$randImage];
+           $bk_source = $this->images[0];
         }
         echo '<li data-transition="fade">
                     <!-- MAIN IMAGE -->
