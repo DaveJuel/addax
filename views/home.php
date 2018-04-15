@@ -21,7 +21,7 @@ ob_start();
         </div>
         <p class="main_description a_center">We make your website awesome.</p>
         <div class="row">
-          <?php $web->showContent("feature",2,["title","description"]); ?>
+          <?php $web->showContent("feature",2,["name","description","image"]); ?>
         </div>
     </div>
 </section>

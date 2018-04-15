@@ -1,7 +1,0 @@
-[10-Apr-2018 00:18:48 Africa/Khartoum] saving data---------------
-[10-Apr-2018 00:18:48 Africa/Khartoum] PHP Notice:  Undefined index: image in /var/www/html/addax/dashboard/includes/interface.php on line 123
-[10-Apr-2018 00:31:59 Africa/Khartoum] PHP Warning:  mkdir(): No such file or directory in /var/www/html/addax/dashboard/includes/classes.php on line 2385
-[10-Apr-2018 00:31:59 Africa/Khartoum] PHP Warning:  move_uploaded_file(..\/..\/images\/uploaded\/637370117614.jpg): failed to open stream: No such file or directory in /var/www/html/addax/dashboard/includes/classes.php on line 2388
-[10-Apr-2018 00:31:59 Africa/Khartoum] PHP Warning:  move_uploaded_file(): Unable to move '/tmp/phpjRGPOJ' to '..\/..\/images\/uploaded\/637370117614.jpg' in /var/www/html/addax/dashboard/includes/classes.php on line 2388
-[10-Apr-2018 00:31:59 Africa/Khartoum] PHP Notice:  Undefined property: file_handler::$path in /var/www/html/addax/dashboard/includes/interface.php on line 124
-[10-Apr-2018 00:32:46 Africa/Khartoum] PHP Notice:  Undefined property: file_handler::$path in /var/www/html/addax/dashboard/includes/interface.php on line 124

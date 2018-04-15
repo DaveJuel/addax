@@ -287,7 +287,7 @@ class main extends UIfeeders
             }
             //action
             if (!isset($action) || $action == true) {
-                $this->tableAction($body[$row][0]);
+                $this->tableAction($body[$row][1]);
             }
             echo "</tr>";
         }
@@ -764,7 +764,8 @@ class main extends UIfeeders
             } else {
                 $query = $query . "," . str_replace(" ", "_", $columnList[$count]['name']);
             }
-        }
+        }        
+        
         $sql = "SELECT id," . $query . " FROM " . $table;
         //executing the query
         try {

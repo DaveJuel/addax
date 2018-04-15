@@ -1,16 +1,14 @@
-<?php 
+<?php
 /**
  * This file is responsible for the display of sections
-*/
+ */
 //TODO: Add implementation
-class sectionFormat{
+class sectionFormat
+{
     public $images = [
-        "../images/defaults/mechanics-2170638_1920.jpg",
-        "../images/defaults/mockup-654585_1280.jpg",
-        "../images/defaults/statistic-1820320_1280.jpg",
-        "../images/defaults/tetris-749690_1920.jpg",
+        "../images/placeholder.png",
     ];
-      /**
+    /**
      * <h1>slideFormat</h1>
      * <p>Making the web slide format</p>
      * @param String $bk_source The source of the background image
@@ -68,25 +66,25 @@ class sectionFormat{
                          data-elementdelay="0.05"
                          style="z-index: 9; font-weight: 400; color: rgba(255, 255, 255, 0.8); font-family: Raleway;">' . $details . '</div>
                 </li>';
-    }  
+    }
 
     /**
      * <h1>showFeature</h1>
      * <p>Show feature section</p>
      * @param $featureList The list of features
-    */
+     */
     public function showFeature($featureList)
     {
         echo '<div class = "col-md-7">'
             . '<div data-slider-id = "features" id = "features_slider" class = "owl-carousel">';
+        //image display
         for ($count = 0; $count < count($featureList); $count++) {
-            //image display
-            /*
-            TODO: Need to show image that is related to the feature.
-            */
-            $randImage = rand(0, 3);
-            $image = $this->images[$randImage];
-            $this->showImage($image);
+            if (isset($featureList[$count][3])) {
+                $this->showImage($featureList[$count][3]);
+            } else {
+                $image = $this->images[0];
+                $this->showImage($image);
+            }
         }
         echo '</div>
         </div>';
