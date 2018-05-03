@@ -44,10 +44,10 @@ require '../includes/interface.php';
         </div>
         <div class="form-group">
             <div class="input-group">
-                <span class="input-group-addon">User type</span>
+                <span class="input-group-addon">role</span>
                 <select name="add_user_type" class="form-control">
-                    <option value="0">Administrator</option>
-                    <option value="1">Editor</option>                    
+                    <option value="0">Select user role</option>
+                   <?php $user->listRoleInOption(); ?>                   
                 </select>
             </div>
         </div>        

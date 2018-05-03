@@ -24,8 +24,8 @@ class connection{
                  */
                 $this->host = "localhost";
                 $this->db = "addax";
-                $this->db_user = getenv("MYSQL_USER");
-                $this->pass_phrase = getenv("MYSQL_PASSWORD");
+                $this->db_user = "monsta";
+                $this->pass_phrase = "Rugamba@Beast101!";
             }
         }        
     }

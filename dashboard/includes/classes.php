@@ -14,6 +14,9 @@ require 'config.php';
 require 'sectionFormat.php';
 $connection = new connection();
 R::setup("mysql:host=$connection->host;dbname=$connection->db", "$connection->db_user", "$connection->pass_phrase");
+R::ext('xdispense', function ($type) {
+    return R::getRedBean()->dispense($type);
+});
 $main = new main();
 class UIfeeders
 {
@@ -329,7 +332,10 @@ class main extends UIfeeders
                 for ($count = 0; $count < count($subjects); $count++) {
                     $subjectId = $subjects[$count]['id'];
                     $subjectTitle = $subjects[$count]['title'];
-                    echo "<li><a href='" . $action . "_article.php?article=$subjectId'>" . $subjectTitle . "</a></li>";
+                    $user = new user();
+                    if ($user->isUserAllowed($action, $subjectTitle)) {
+                        echo "<li><a href='" . $action . "_article.php?article=$subjectId'>" . $subjectTitle . "</a></li>";
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -650,7 +656,7 @@ class main extends UIfeeders
                 $attrName = $attributes[$counter]["name"];
                 $attrType = $attributes[$counter]["type"];
                 echo "<div class='form-group'>";
-                $this->inputGenerator($attributes[$counter]["id"], $attrName, $attrType,$caller);
+                $this->inputGenerator($attributes[$counter]["id"], $attrName, $attrType, $caller);
                 echo "</div>";
                 $built = true;
             }
@@ -671,7 +677,7 @@ class main extends UIfeeders
      * <p>Generates the input for attributes with default datatypes</p>
      * @param String $name The name of the attribute
      */
-    private function inputGenerator($id, $name, $type,$caller)
+    private function inputGenerator($id, $name, $type, $caller)
     {
         if (isset($this->instance)) {
             $value = $this->getValue($name);
@@ -685,33 +691,33 @@ class main extends UIfeeders
         if ($this->isDataTypeDefault($type)) {
             switch ($type) {
                 case 'text':
-                    $input = "<input type='text' name='$name' id='$caller"."_"."$name' class='form-control' $holder='$value'>";
+                    $input = "<input type='text' name='$name' id='$caller" . "_" . "$name' class='form-control' $holder='$value'>";
                     break;
                 case 'numeric':
-                    $input = "<input type='number' name='$name' id='$caller"."_"."$name' class='form-control' $holder='$value'>";
+                    $input = "<input type='number' name='$name' id='$caller" . "_" . "$name' class='form-control' $holder='$value'>";
                     break;
                 case 'date':
-                    $input = "<input type='date' name='$name' id='$caller"."_"."$name' class='form-control'$holder='$value'>";
+                    $input = "<input type='date' name='$name' id='$caller" . "_" . "$name' class='form-control'$holder='$value'>";
                     break;
                 case 'file':
-                    $input = "<input type='file' id='$caller"."_"."$name' class='form-control' $holder='$value'>";
+                    $input = "<input type='file' id='$caller" . "_" . "$name' class='form-control' $holder='$value'>";
                     break;
                 case 'long text':
-                    $input = "<textarea class='form-control' id='$caller"."_"."$name' name='$name'>$value</textarea>";
+                    $input = "<textarea class='form-control' id='$caller" . "_" . "$name' name='$name'>$value</textarea>";
                     break;
             }
         } else {
-            $input = $this->referentialDataInputGenerator($id, $name, $type);
+            $input = $this->referentialDataInputGenerator($id, $name, $type, $caller);
         }
         $formInput = $title . $input;
         echo "<div class='input-group'>" . $formInput . "</div>";
     }
 
-    private function referentialDataInputGenerator($id, $name, $type)
+    private function referentialDataInputGenerator($id, $name, $type, $caller)
     {
         $input = "";
         if (isset($id) && isset($name) && isset($type)) {
-            $startCombo = "<select type='date' name='$name' class='form-control'>";
+            $startCombo = "<select type='date' name='$name' id='$caller" . "_" . "$name' class='form-control'>";
             $subjectObj = new subject();
             $reference = $subjectObj->readReference($id);
             if (isset($reference) && $subjectObj->isDataTypeTable($type)) {
@@ -764,8 +770,8 @@ class main extends UIfeeders
             } else {
                 $query = $query . "," . str_replace(" ", "_", $columnList[$count]['name']);
             }
-        }        
-        
+        }
+
         $sql = "SELECT id," . $query . " FROM " . $table;
         //executing the query
         try {
@@ -875,11 +881,6 @@ class user extends main
     public $status = "";
     public $loggedIn = null;
     public $toVerify = null;
-    private $userType = [
-        0 => "administrator",
-        1 => "editor",
-        2 => "visitor",
-    ];
     public $count;
     public $userlist = [];
 
@@ -895,7 +896,6 @@ class user extends main
     public function count()
     {
         $users = [];
-        $userTypeList = $this->userType;
         $loggedInType = $this->getUserType();
         if ($loggedInType == "administrator") {
             try {
@@ -1102,9 +1102,9 @@ class user extends main
         if (isset($_SESSION["user_id"])) {
             $userId = $_SESSION["user_id"];
             try {
-                $type = R::getCell("SELECT DISTINCT type FROM credentials WHERE user = '$userId'");
-                if ($type != null) {
-                    $userType = $this->userType[$type];
+                $type_id = R::getCell("SELECT DISTINCT type FROM credentials WHERE user = '$userId'");
+                if ($type_id != null) {
+                    $userType = R::getCell("SELECT DISTINCT title FROM role WHERE id='$type_id'");
                 }
             } catch (Exception $e) {
                 error_log("USER[getUserType]:" . $e);
@@ -1113,6 +1113,41 @@ class user extends main
         return $userType;
     }
 
+    /**
+     * This function checks if the user is allowed to do the subject.
+     * @param $toDo What the user needs
+     */
+    public function isUserAllowed($toDo, $subject)
+    {
+        $isAllowed = false;
+        $userType = $this->getUserType();
+        if (isset($userType)) {
+            try {
+                $userPrivilege = R::getRow("SELECT writing,reading FROM privilege WHERE subject='$subject'");
+                if ($toDo == 'add' && $userPrivilege['writing'] == "allowed") {
+                    $isAllowed = true;
+                }
+                if ($toDo == 'view' && $userPrivilege['reading'] == "allowed") {
+                    $isAllowed = true;
+                }
+            } catch (Exception $e) {
+                error_log("isuserAllowed:" . $e);
+            }
+        }
+        return $isAllowed;
+    }
+
+    public function listRoleInOption()
+    {
+        try {
+            $roleDetails = R::getAll("SELECT id,title FROM role");
+            for ($counter = 0; $counter < count($roleDetails); $counter++) {
+                echo "<option name='add_user_type' value=".$roleDetails[$counter]['id'].">".$roleDetails[$counter]['title']."</option>";
+            }
+        } catch (Exception $e) {
+            error_log("Unable to read list of roles.");
+        }
+    }
     /**
      * <h1>getUserDetails</h1>
      * <p>This method is to fetch information of the user.</p>
@@ -1374,7 +1409,8 @@ class content extends main
     {
         $status = false;
         try {
-            $article = R::dispense($subjectTitle);
+            $subjectTitle = str_replace(" ", "_", $subjectTitle);
+            $article = R::xdispense($subjectTitle);
             for ($counter = 0; $counter < count($attributes); $counter++) {
                 $attribute = str_replace(" ", "_", $attributes[$counter]['name']);
                 if ($attributes[$counter]['type'] == 'text') {
@@ -1406,7 +1442,7 @@ class content extends main
     public function add($content, $values, $attributes)
     {
         try {
-            $article = R::dispense($content);
+            $article = R::xdispense($content);
             for ($counter = 0; $counter < count($attributes); $counter++) {
                 $attribute = str_replace(" ", "_", $attributes[$counter]['name']);
                 $value = $values[$counter];
@@ -2339,7 +2375,7 @@ class file_handler extends main
 
     public $status = "";
     public $fileId = "";
-    public $filePath="";
+    public $filePath = "";
 
     /**
      * <h1>upload</h1>
@@ -2390,13 +2426,13 @@ class file_handler extends main
                     try {
                         $fileDetails = R::dispense("image");
                         $fileDetails->name = $taget_file;
-                        $fileDetails->path = "../images/uploaded/".$taget_file;
+                        $fileDetails->path = "../images/uploaded/" . $taget_file;
                         $fileDetails->added_on = date("Y-m-d h:m:s");
                         $fileDetails->added_by = $_SESSION['user_id'];
                         $fileDetails->status = false;
                         $fileId = R::store($fileDetails);
-                        $this->filePath="../images/uploaded/".$taget_file;;
-                        $this->status = json_encode(array('id' => $fileId, 'type' => 'success', 'text' => "Upload successful",'path'=>$path));
+                        $this->filePath = "../images/uploaded/" . $taget_file;
+                        $this->status = json_encode(array('id' => $fileId, 'type' => 'success', 'text' => "Upload successful", 'path' => $path));
                     } catch (Exception $e) {
                         $this->status = $this->feedbackFormat(0, "Image not added");
                         error_log($e);
