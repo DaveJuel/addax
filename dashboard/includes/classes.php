@@ -146,7 +146,6 @@ class main extends UIfeeders
     public $status;
     public $appName = "Addax";
     public $author = "David NIWEWE";
-    public $dbname = "";
 
     public function __construct()
     {
@@ -828,7 +827,7 @@ class main extends UIfeeders
             } else if (isset($tableName) && (!$this->isDataTypeTable($tableName) && $this->isDataTypeColumn($tableName))) {
                 $_SESSION['ref_data_value'] = $columnName = $tableName;
             }
-            if (isset($columnName) && $this->isDataTypeColumn($columnName) && isset($_SESSION['ref_data_type'])) {
+            if (privilege_grantisset($columnName) && $this->isDataTypeColumn($columnName) && isset($_SESSION['ref_data_type'])) {
                 $columns = R::getAll("SELECT DISTINCT COLUMN_NAME
                                       FROM INFORMATION_SCHEMA.COLUMNS
                                       WHERE COLUMN_NAME='$columnName'");
@@ -896,21 +895,29 @@ class user extends main
     public function count()
     {
         $users = [];
-        $loggedInType = $this->getUserType();
-        if ($loggedInType == "administrator") {
-            try {
-                $users = R::getAll("SELECT * FROM credentials");
-                $this->count = count($users);
-            } catch (Exception $e) {
-                error_log("ERROR(USER:COUNT):" . $e);
-            }
-        } else {
-            try {
-                $type = array_search($loggedInType, $this->userType);
-                $users = R::getAll("SELECT * FROM credentials WHERE type='$type'");
-                $this->count = count($users);
-            } catch (Exception $e) {
-                error_log("ERROR(USER:COUNT):" . $e);
+        if (isset($_SESSION['user_id'])) {
+            $userId = $_SESSION['user_id'];
+            $loggedInType = $this->getUserType($userId);
+            if ($loggedInType == "administrator") {
+                try {
+                    $users = R::getAll("SELECT * FROM credentials");
+                    $this->count = count($users);
+                } catch (Exception $e) {
+                    error_log("ERROR(USER:COUNT):" . $e);
+                }
+            } else {
+                try {
+                    if ($loggedInType != null) {
+                        $type = R::getCell("SELECT DISTINCT id FROM role WHERE title='$loggedInType'");
+                        $users = R::getAll("SELECT * FROM credentials WHERE type='$type'");
+                        $this->count = count($users);
+                    } else {
+                        $this->count = "N/A";
+                    }
+
+                } catch (Exception $e) {
+                    error_log("ERROR(USER:COUNT):" . $e);
+                }
             }
         }
     }
@@ -935,7 +942,7 @@ class user extends main
                     $names = $users[$row]['fname'] . " " . $users[$row]['lname'];
                     $email = $users[$row]['email'];
                     $tel = $users[$row]['phone'];
-                    $type = $this->userType[$users[$row]['type']];
+                    $type = $this->getUserType($users[$row]['id']);
                     $tableContent[$row] = array($userId, $rowNumber, $names, $email, $tel, $type);
                 }
                 $this->displayTable($header, $tableContent, null);
@@ -1096,13 +1103,12 @@ class user extends main
     /**
      * Return the user type of the logged in user
      */
-    public function getUserType()
+    public function getUserType($user_id)
     {
         $userType = null;
-        if (isset($_SESSION["user_id"])) {
-            $userId = $_SESSION["user_id"];
+        if ($user_id) {
             try {
-                $type_id = R::getCell("SELECT DISTINCT type FROM credentials WHERE user = '$userId'");
+                $type_id = R::getCell("SELECT DISTINCT type FROM credentials WHERE user = '$user_id'");
                 if ($type_id != null) {
                     $userType = R::getCell("SELECT DISTINCT title FROM role WHERE id='$type_id'");
                 }
@@ -1120,18 +1126,21 @@ class user extends main
     public function isUserAllowed($toDo, $subject)
     {
         $isAllowed = false;
-        $userType = $this->getUserType();
-        if (isset($userType)) {
-            try {
-                $userPrivilege = R::getRow("SELECT writing,reading FROM privilege WHERE subject='$subject'");
-                if ($toDo == 'add' && $userPrivilege['writing'] == "allowed") {
-                    $isAllowed = true;
+        if (isset($_SESSION['user_id'])) {
+            $userId = $_SESSION['user_id'];
+            $userType = $this->getUserType($userId);
+            if (isset($userType)) {
+                try {
+                    $userPrivilege = R::getRow("SELECT writing,reading FROM privilege WHERE subject='$subject' AND role='$userType'");
+                    if ($toDo == 'add' && $userPrivilege['writing'] == "allowed") {
+                        $isAllowed = true;
+                    }
+                    if ($toDo == 'view' && $userPrivilege['reading'] == "allowed") {
+                        $isAllowed = true;
+                    }
+                } catch (Exception $e) {
+                    error_log("isuserAllowed:" . $e);
                 }
-                if ($toDo == 'view' && $userPrivilege['reading'] == "allowed") {
-                    $isAllowed = true;
-                }
-            } catch (Exception $e) {
-                error_log("isuserAllowed:" . $e);
             }
         }
         return $isAllowed;
@@ -1142,7 +1151,7 @@ class user extends main
         try {
             $roleDetails = R::getAll("SELECT id,title FROM role");
             for ($counter = 0; $counter < count($roleDetails); $counter++) {
-                echo "<option name='add_user_type' value=".$roleDetails[$counter]['id'].">".$roleDetails[$counter]['title']."</option>";
+                echo "<option name='add_user_type' value=" . $roleDetails[$counter]['id'] . ">" . $roleDetails[$counter]['title'] . "</option>";
             }
         } catch (Exception $e) {
             error_log("Unable to read list of roles.");
@@ -1591,8 +1600,8 @@ class message extends main
     public function count()
     {
         $userObj = new user();
-        $userType = $userObj->getUserType();
         $userId = $_SESSION['user_id'];
+        $userType = $userObj->getUserType($userId);
         $message = ["sent" => 0, "received" => 0, "not read" => 0];
         try {
             $notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$userType' AND status='0'");
@@ -1661,8 +1670,8 @@ class message extends main
     private function fetch()
     {
         $userObj = new user();
-        $userType = $userObj->getUserType();
         $userId = $_SESSION['user_id'];
+        $userType = $userObj->getUserType($userId);
         try {
             //$notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$userType' AND status='0'");
             $notRead = R::getAll("SELECT id,sender,message,created_on,status FROM message WHERE receiver='$userId' OR receiver='$userType' AND status='0'");
@@ -1771,8 +1780,8 @@ class notification extends main
     public function alert()
     {
         $userObj = new user();
-        $userType = $userObj->getUserType();
         $userId = $_SESSION['user_id'];
+        $userType = $userObj->getUserType($userId);
         try {
             $userTypeCode = R::getCell("SELECT DISTINCT type FROM credentials WHERE user='$userId' LIMIT 1");
             $notificationUL = R::getAll("SELECT id,title,description,created_on FROM notification WHERE privacy='1' AND dedicated='$userTypeCode' ORDER BY created_on DESC");
@@ -1832,8 +1841,8 @@ class notification extends main
     public function count()
     {
         $userObj = new user();
-        $userType = $userObj->getUserType();
         $userId = $_SESSION['user_id'];
+        $userType = $userObj->getUserType($userId);
         try {
             /*
              * Getting the user type
@@ -1859,8 +1868,8 @@ class notification extends main
     public function fetch()
     {
         $userObj = new user();
-        $userType = $userObj->getUserType();
         $userId = $_SESSION['user_id'];
+        $userType = $userObj->getUserType($userId);
         $details = [];
         try {
             $userTypeCode = R::getCell("SELECT DISTINCT type FROM credentials WHERE user='$userId' LIMIT 1");
@@ -2142,16 +2151,19 @@ class dashboard
         $messageObj = new message();
         $notificationObj = new notification();
         $userObj = new user();
-        $userType = $userObj->getUserType();
-        if ($userType == "administrator") {
-            $titleList = ["Users", "Notifications", "Messages", "Log"];
-            $countList = [$userObj->count, $notificationObj->count, $messageObj->count, "-"];
-        } else {
-            $titleList = ["Users", "Notifications", "Messages", "N/A"];
-            $countList = [$userObj->count, $notificationObj->count, $messageObj->count, "-"];
+        if(isset($_SESSION['user_id'])){
+            $userType = $userObj->getUserType($_SESSION['user_id']);
+            if ($userType == "administrator") {
+                $titleList = ["Users", "Notifications", "Messages", "Log"];
+                $countList = [$userObj->count, $notificationObj->count, $messageObj->count, "-"];
+            } else {
+                $titleList = ["Users", "Notifications", "Messages", "N/A"];
+                $countList = [$userObj->count, $notificationObj->count, $messageObj->count, "-"];
+            }
+            $this->number = $countList;
+            $this->title = $titleList;
         }
-        $this->number = $countList;
-        $this->title = $titleList;
+        
     }
 
 }
