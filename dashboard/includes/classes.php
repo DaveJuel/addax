@@ -1006,13 +1006,14 @@ class user extends main
      * @param $username The user name to validate.
      * @return Boolean
      */
-    private function isValid($username)
+    public function isUsernameValid($username)
     {
         $status = true;
         try {
             $check = R::getCol("SELECT id FROM credentials WHERE username='$username'");
             if (sizeof($check) != 0) {
                 $status = false;
+                $this->status = "Username already exists";
             }
         } catch (Exception $e) {
             $status = false;
@@ -1021,6 +1022,31 @@ class user extends main
         return $status;
     }
 
+    /**
+     * Validates the email of the user registering
+     * @param $email the email to verify.
+     * @return boolean true if email is valid
+     */
+    public function isEmailValid($email)
+    {
+        $status = true;
+        if (strpos($email, "@") === false || strpos($email, ".")) {
+            $status = false;
+            $this->status = "Invalid email" . $email;
+        } else {
+            try {
+                $check = R::getCol("SELECT id FROM credentials WHERE username='$username'");
+                if (sizeof($check) != 0) {
+                    $status = false;
+                    $this->status = "Email already exists" . $email;
+                }
+            } catch (Exception $exc) {
+                $status = false;
+                $this->status = "Error checking the email" . $exc;
+            }
+        }
+        return $status;
+    }
     //evaluating logged in user
     private function evalLoggedUser($id, $u)
     {
@@ -2152,7 +2178,7 @@ class dashboard
         $messageObj = new message();
         $notificationObj = new notification();
         $userObj = new user();
-        if(isset($_SESSION['user_id'])){
+        if (isset($_SESSION['user_id'])) {
             $userType = $userObj->getUserType($_SESSION['user_id']);
             if ($userType == "administrator") {
                 $titleList = ["Users", "Notifications", "Messages", "Log"];
@@ -2164,7 +2190,7 @@ class dashboard
             $this->number = $countList;
             $this->title = $titleList;
         }
-        
+
     }
 
 }
