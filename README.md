@@ -12,32 +12,32 @@ This will help you build the dashboard you have in mind, once you have specifica
 It does not require any coding part unless if you want to extend on what's already there. No coding, no DB worries it is all done automatically. Just follow the guidelines  and for any assistance, check at the bottom of this file.
 
 ### Features ###
-* User profile management 
-    -> Creating account
-    -> Login and logout
-    -> View & Update profile
+#### User profile management #### 
+* Creating account.
+* Login and logout.
+* View & Update profile.
 
-* Roles & Privilege management
-    -> Create roles
-    -> Add preveleges on created roles
+#### Roles & Privilege management ####
+* Create roles.
+* Add preveleges on created roles.
 
-* Content management
-    -> Create content
-    -> Navigation links auto generating
-    -> Data input forms auto generating
-    -> Content viewing & search
+#### Content management ####
+* Create content.
+* Navigation links auto generating.
+* Data input forms auto generating.
+* Content viewing & search.
 
-* Landing page
-    -> Welcome slider section
-    -> Features/Services section
-    -> Contact us form (Sending message to the dashboard)
+#### Landing page ####
+* Welcome slider section.
+* Features/Services section.
+* Contact us form (Sending message to the dashboard).
 
-* Online support 
-    -> Visitor monitoring
-    -> Chatting app 
-    -> Ticket creating
+#### Online support ####
+* Visitor monitoring.
+* Chatting app. 
+* Ticket creating.
 
-* Bulk SMS (On purchase)
+#### Bulk SMS (On purchase) ####
 
 ### INSTALLATION PREREQUISITES ###
 
