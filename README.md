@@ -4,8 +4,40 @@ This file is to instruct you installing and successfully running Addax.
 
 ### What is this repository for? ###
 
-* Addax is a web content management application. It is web based.
+* Addax is a web dashboard builder.
 * Version 1.0.0 beta
+
+### Description ###
+This will help you build the dashboard you have in mind, once you have specification well defined you're good to start.
+It does not require any coding part unless if you want to extend on what's already there. No coding, no DB worries it is all done automatically. Just follow the guidelines  and for any assistance, check at the bottom of this file.
+
+### Features ###
+* User profile management 
+- Creating account
+- Login and logout
+- View & Update profile
+
+* Roles & Privilege management
+- Create roles
+- Add preveleges on created roles
+
+* Content management
+- Create content
+- Navigation links auto generating
+- Data input forms auto generating
+- Content viewing & search
+
+* Landing page
+- Welcome slider section
+- Features/Services section
+- Contact us form (Sending message to the dashboard)
+
+* Online support 
+- Visitor monitoring
+- Chatting app 
+- Ticket creating
+
+* Bulk SMS (On purchase)
 
 ### INSTALLATION PREREQUISITES ###
 
@@ -38,4 +70,4 @@ There you go, every thing done well.
 ### Who do I talk to? ###  
 In case you need help!  
   
-* David NIWEWE[phone:+250788353869 , email:davejuelz@gmail.com ]
+* David NIWEWE [phone:+250788353869 , email:davejuelz@gmail.com ]
