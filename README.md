@@ -13,29 +13,29 @@ It does not require any coding part unless if you want to extend on what's alrea
 
 ### Features ###
 * User profile management 
--> Creating account
--> Login and logout
--> View & Update profile
+    -> Creating account
+    -> Login and logout
+    -> View & Update profile
 
 * Roles & Privilege management
--> Create roles
--> Add preveleges on created roles
+    -> Create roles
+    -> Add preveleges on created roles
 
 * Content management
--> Create content
--> Navigation links auto generating
--> Data input forms auto generating
--> Content viewing & search
+    -> Create content
+    -> Navigation links auto generating
+    -> Data input forms auto generating
+    -> Content viewing & search
 
 * Landing page
--> Welcome slider section
--> Features/Services section
--> Contact us form (Sending message to the dashboard)
+    -> Welcome slider section
+    -> Features/Services section
+    -> Contact us form (Sending message to the dashboard)
 
 * Online support 
--> Visitor monitoring
--> Chatting app 
--> Ticket creating
+    -> Visitor monitoring
+    -> Chatting app 
+    -> Ticket creating
 
 * Bulk SMS (On purchase)
 
