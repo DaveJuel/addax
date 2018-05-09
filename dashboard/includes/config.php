@@ -1,4 +1,8 @@
 <?php
+define("APP_NAME","Addax");
+define("APP_AUTHOR","David NIWEWE");
+define("APP_ORGANIZATION","Addax tech");
+
 /*
 This is the function that is responsible for database connection
 */
@@ -24,12 +28,10 @@ class connection{
                  */
                 $this->host = "localhost";
                 $this->db = "addax";
-                $this->db_user = "monsta";
-                $this->pass_phrase = "Rugamba@Beast101!";
+                //Make sure yu have the environment variables set.
+                $this->db_user = getenv("DB_USER");
+                $this->pass_phrase =getenv("DB_PASSWORD");
             }
         }        
     }
 }
-
-
-

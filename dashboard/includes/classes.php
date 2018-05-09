@@ -144,14 +144,15 @@ class main extends UIfeeders
 {
 
     public $status;
-    public $appName = "Addax";
-    public $author = "David NIWEWE";
+    public $appName = APP_NAME;
+    public $author = APP_AUTHOR;
 
     public function __construct()
     {
         $connection = new connection();
         $this->dbname = $connection->db;
     }
+
     /**
      * <h1>feedbackFormat</h1>
      * <p>This method is to format for performed action</p>

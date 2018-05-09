@@ -19,8 +19,7 @@ After cloning this project to your desired directory[Windows: C:~/xampp/htdocs ,
 * Configure the database  
 -> In DB management app (eg:phpmyadmin, workbench,...), create a database.   
 -> Import the database(addax.sql) from Addax root folder, to your newly created database.  
--> Go into ~/addax/admin/includes and open file 'config.php' change your local connection values respective to your settings.
--> Change to database connection respective to your mysql configurations on line 9.  
+-> Set DB_USER and DB_PASSWORD in your system environment in accordance of your MySql credentials.
 
 * Run the application  
 After finishing the steps above, you will need to run the app on your local machine.  
