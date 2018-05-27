@@ -1509,7 +1509,6 @@ class message extends main
      */
     public function send($sender, $email, $message)
     {
-        $user = new user();
         $fullname = explode(" ", $sender);
         if (isset($fullname[0]) && isset($fullname[1])) {
             $fname = $fullname[0];
@@ -1532,15 +1531,12 @@ class message extends main
         /*
          * Create user before sending message
          */
-        //$user->add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type, $age, $gender);
-        $user_id = $user->add($fname, $lname, null, $email, null, null, $email, $lname, 4, $age);
         try {
             $messageQR = R::dispense("message");
-            $messageQR->user = $user_id;
             $messageQR->sender = $sender;
             $messageQR->email = $email;
             $messageQR->message = $message;
-            $messageQR->receiver = 0;
+            $messageQR->receiver = getenv("ADDAX_AUTHOR");
             $messageQR->created_on = date("Y-m-d h:m:s");
             $messageQR->status = 0;
             R::store($messageQR);
@@ -1560,10 +1556,9 @@ class message extends main
     {
         $userObj = new user();
         $username = $_SESSION['username'];
-        $userType = $userObj->getUserType($username);
         $message = ["sent" => 0, "received" => 0, "not read" => 0];
         try {
-            $notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$userType' AND status='0'");
+            $notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$username' AND status='0'");
             $this->count = count($notRead);
             if ($this->count > 0) {
                 $this->head = "You have " . $this->count . " messages";
@@ -1632,8 +1627,7 @@ class message extends main
         $username = $_SESSION['username'];
         $userType = $userObj->getUserType($username);
         try {
-            //$notRead = R::getAll("SELECT id,sender,message,created_on FROM message WHERE receiver='$userType' AND status='0'");
-            $notRead = R::getAll("SELECT id,sender,message,created_on,status FROM message WHERE receiver='$username' OR receiver='$userType' AND status='0'");
+            $notRead = R::getAll("SELECT id,sender,message,created_on,status FROM message WHERE receiver='$username' AND status='0'");
             if (count($notRead) > 0) {
                 for ($countNR = 0; $countNR < count($notRead); $countNR++) {
                     $details[$countNR] = [
@@ -2500,7 +2494,7 @@ class validation extends main
         $user = new user();
         $isValid = false;
         //TODO: remove the delete_subject
-        if (!empty($action) && ($action == "Login" || $action == "sign_up") || $action == "delete_subject") {
+        if (!empty($action) && ($action == "Login" || $action == "sign_up") || $action == "delete_subject" || $action=="send_message") {
             $isValid = true;
         } else if ($user->checkLogin()) {
             $isValid = true;
