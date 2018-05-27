@@ -5,7 +5,7 @@ This file is to instruct you installing and successfully running Addax.
 ### What is this repository for? ###
 
 * Addax is a web dashboard builder.
-* Version 1.0.0 beta
+* Version 1.1.0 release
 
 ### Description ###
 This will help you build the dashboard you have in mind, once you have specification well defined you're good to start.
@@ -49,22 +49,22 @@ You may need to contact the author on this one
 ### CONFIGURATION DETAILS ###
 After cloning this project to your desired directory[Windows: C:~/xampp/htdocs , Linux: /var/www/html], you need to do the following.  
   
-* Configure the database  
--> In DB management app (eg:pgAdmin4), create a database.   
--> Set environment variable ADDAX_DB with the name of the database you created.  
--> Set PGQL_DB_USER and PGQL_DB_PASS in your system environment in accordance of your Postgres credentials.
--> Set PGQL_HOST environment variable to "_localhost_"
+#### Configure the database #### 
+* In DB management app (eg:pgAdmin4), create a database.   
+* Set environment variable ADDAX_DB with the name of the database you created.  
+* Set PGQL_DB_USER and PGQL_DB_PASS in your system environment in accordance of your Postgres credentials.
+* Set PGQL_HOST environment variable to "_localhost_"
 
-* Run the application  
+#### Run the application #### 
 After finishing the steps above, you will need to run the app on your local machine.  
--> Set OPTS_ENV environment variable to "_local_"
--> Set ADDAX_AUTHOR environment variable with any email you want to register with.
--> Set ADDAX_PASSCODE environment variable with the password you want to register with.
--> Go into your browser and type _localhost/addax/dashboard/views/login.php_.  
--> If all was done successfully, you will find a login page.   
--> Click on create account
--> the email should be the value you set in ADDAX_AUTHOR for you to have super user role
--> the password should be the value you set in ADDAX_PASSCODE for you to have super user role
+* Set OPTS_ENV environment variable to "_local_"
+* Set ADDAX_AUTHOR environment variable with any email you want to register with.
+* Set ADDAX_PASSCODE environment variable with the password you want to register with.
+* Go into your browser and type _localhost/addax/dashboard/views/login.php_.  
+* If all was done successfully, you will find a login page.   
+* Click on create account
+* the email should be the value you set in ADDAX_AUTHOR for you to have super user role
+* the password should be the value you set in ADDAX_PASSCODE for you to have super user role
   
 There you go, every thing done well.  
 ### Contribution guidelines ###  
