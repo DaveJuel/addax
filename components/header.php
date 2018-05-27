@@ -25,7 +25,7 @@
                 </li>                
                 <li><a href="#contact">CONTACT US</a></li>                
                 <li class="menu_button">
-                    <a href="../dashboard/views/login.php" class="button  btn_yellow"><i class="fa fa-sign-in"></i>SIGN IN</a>
+                    <a href="https://github.com/DaveJuel/addax" target="_blank" class="button  btn_yellow"><i class="fa fa-download"></i>DOWNLOAD</a>
                 </li>
             </ul>
         </nav>
