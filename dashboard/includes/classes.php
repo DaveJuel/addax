@@ -2173,7 +2173,7 @@ class web extends main
                 $attributList[$count] = ["name" => $attributes[$count]];
             }
             $contentList = $this->fetchBuilder($title, $attributList);
-            for ($outer = 0; $outer < count($contentList); $outer++) {
+            for ($outer = 0;null!==$contentList && $outer < count($contentList); $outer++) {
                 $contentItem = $contentList[$outer];
                 switch ($formatType) {
                     case 1: //slide
@@ -2383,14 +2383,14 @@ class file_handler extends main
      */
     public function upload($file)
     {
+        $isUploaded=false;
         //GETTING THE PARAMETERS TO READ
         //PHONE => DEFINE COLUMN TO READ
-        $db_file_name = basename($file['name']);
+        $db_file_name = basename($file['name']);        
         $ext = explode(".", $db_file_name);
         $fileExt = end($ext);
         if ($fileExt == "jpeg" || $fileExt == "png" || $fileExt == "jpg") {
-
-            $upload_errors = array(
+           $upload_errors = array(
                 // http://www.php.net/manual/en/features.file-upload.errors.php
 
                 UPLOAD_ERR_OK => "No errors.",
@@ -2405,8 +2405,10 @@ class file_handler extends main
 
             if (!$file || empty($file) || !is_array($file)) {
                 $this->status = $this->feedbackFormat(1, "No file was attached");
+                error_log("ERROR(upload):No file was attached");
             } else if ($file["error"] != 0) {
                 $this->status = $this->feedbackFormat(0, $upload_errors[$file["error"]]);
+                error_log("ERROR(upload)".$upload_errors[$file["error"]]);
             } else if ($file["error"] == 0) {
                 $size = $file['size'];
                 $type = $file['type'];
@@ -2429,6 +2431,10 @@ class file_handler extends main
                         $fileDetails->added_by = $_SESSION['user_id'];
                         $fileDetails->status = false;
                         $fileId = R::store($fileDetails);
+                        if(isset($fileId)){
+                            error_log("file id".$fileId);
+                            $isUploaded=true;
+                        }
                         $this->filePath = "../images/uploaded/" . $taget_file;
                         $this->status = json_encode(array('id' => $fileId, 'type' => 'success', 'text' => "Upload successful", 'path' => $path));
                     } catch (Exception $e) {
@@ -2437,12 +2443,14 @@ class file_handler extends main
                     }
                 } else {
                     $this->status = $this->feedbackFormat(0, "Failed to add file");
+                    error_log("ERROR(upload):Failed to add file");
                 }
             }
         } else {
             $this->status = $this->feedbackFormat(0, "The File is not an image.");
+            error_log("ERROR(upload):The File is not an image.");
         }
-        return $this->status;
+        return $isUploaded;
     }
 
 }

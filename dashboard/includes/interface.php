@@ -121,7 +121,7 @@ switch ($action) {
         $type = $_REQUEST['subject_type'];
         $attrNumber = $_REQUEST['subject_count_attr'];
         $attrString = "";
-        if (isset($title) && isset($attrNumber) && isset($_REQUEST['attr_name0']) && (isset($type) && $type != 0)) {
+        if (isset($title) && isset($attrNumber) && isset($_REQUEST['attr_name0']) && $type !== 0) {
             //looping throughout the attributes
             $attributes = array();
             for ($count = 0; $count < $attrNumber; $count++) {
@@ -182,23 +182,26 @@ switch ($action) {
                 $attributeName = str_replace("_", " ", $attributes[$count]['name']);
                 $nullProperty = $attributes[$count]['is_null'];
                 $uniqueProperty = $attributes[$count]['is_unique'];
-                if ($nullProperty == "false" && empty($_REQUEST[$attributes[$count]['name']])) {
+                if ($attributes[$count]['type'] == "file") {
+                    $file = $_FILES[$attributes[$count]['name']];
+                    $isUploaded=$fileHandler->upload($file);
+                    if($isUploaded!=true){
+                        die($fileHandler->status);
+                    }else{
+                        $values[$count] = $fileHandler->filePath;
+                    }                    
+                } else {
+                    $values[$count] = $_REQUEST[$attributes[$count]['name']];
+                }
+                if ($nullProperty == "false" && empty($values[$count])) {
                     $isDataValid = false;
                     $main->status = $main->feedbackFormat(0, $attributeName . " is required");
                     die($main->status);
-                } else if ($uniqueProperty == "true" && $validation->isUnique($main->header($articleId), $attributes[$count]['name'], $_REQUEST[$attributes[$count]['name']]) != true) {
+                } else if ($uniqueProperty == "true" && $validation->isUnique($main->header($articleId), $attributes[$count]['name'], $values[$count]) != true) {
                     $isDataValid = false;
                     $main->status = $main->feedbackFormat(0, $attributeName . " must be unique, and " . $_REQUEST[$attributes[$count]['name']] . " is already saved");
                     die($main->status);
-                } else {
-                    if ($attributes[$count]['type'] == "file") {
-                        $file = $_FILES[$attributes[$count]['name']];
-                        $fileHandler->upload($file);
-                        $values[$count] = $fileHandler->filePath;
-                    } else {
-                        $values[$count] = $_REQUEST[$attributes[$count]['name']];
-                    }
-                }
+                } 
             }
             if ($isDataValid == true) {
                 $main->status = $content->add($main->header($articleId), $values, $attributes);
