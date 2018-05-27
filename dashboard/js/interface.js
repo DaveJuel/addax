@@ -43,7 +43,8 @@ $("#login-form").on('submit', function (e) {
         'log_username': username,
         'log_password': password
     };
-
+    output = '<div class="alert alert-info"><span class="notification-icon"><i class="glyphicon glyphicon-repeat fast-right-spinner" aria-hidden="true"></i></span><span class="notification-text">Logging in...</span></div>';
+    $("#notification").html(output);   
     //Ajax post data to server
     $.post('../includes/interface.php', post_data, function (response) {
         //Response server message
@@ -152,38 +153,33 @@ $("#add-user-form").on('submit', function (e) {
 //END ADD USER------------------------
 
 //REGISTER
-$("register-form").on("submit", function (e) {
-    e.preventDefault();
-    var fname = $("input[name=register_fname]").val();
-    var lname = $("input[name=register_lname]").val();
-    var email = $("input[name=register_email]").val();
-    var username = $("input[name=register_username]").val();
+$("#register-form").on("submit", function (e) {
+    e.preventDefault();   
+    var firstName =  $("input[name=register_fname]").val();
+    var lastName =  $("input[name=register_lname]").val();
+    var email = $("input[name=register_email]").val();    
     var password = $("input[name=register_password]").val();
     var confirmPassword = $("input[name=confirm_password]").val();
-
     //Data to be sent to server
     var post_data;
     var output;
     post_data = {
-        'action': "add_user",
-        'fname': fname,
-        'lname': lname,
-        'oname': oname,
-        'email': email,
-        'phone': "",
-        'address': "",
-        'user_type': 0,
-        'username': username,
-        'password': password,
+        'action': "sign_up",
+        'register_fname': firstName,
+        'register_lname': lastName,
+        'register_email': email,
+        'register_password': password,
         'confirm_password': confirmPassword
     };
-
+    output = '<div class="alert alert-info"><span class="notification-icon"><i class="glyphicon glyphicon-repeat fast-right-spinner" aria-hidden="true"></i></span><span class="notification-text"> Creating account...</span></div>';
+    $("#notification").html(output);   
     //Ajax post data to server
     $.post('../includes/interface.php', post_data, function (response) {
         //Response server message
         if (response.type == 'error') {
             output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
         } else if (response.type == "success") {
+            $("input, .form-group").val('');
             output = '<div class="alert alert-success"><span class="notification-icon"><i class="glyphicon glyphicon-ok-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
         } else {
             output = '<div class="alert alert-warning"><span class="notification-icon"><i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i></span><span class="notification-text">' + response.text + '</span></div>';
@@ -252,6 +248,15 @@ $(".save-article").on('click', function (e) {
     }
 });
 
+/**
+ * Deleting the content
+*/
+function deleteSubject(obj){
+    var subjectTitle=obj.value;
+    var dataToPost="action=delete_subject&subject_title="+subjectTitle;
+    postData(dataToPost);
+}
+
 function fetchDataToSave(articleId) {
     var dataToPost;
     if (articleId != null) {
@@ -318,8 +323,10 @@ function postData(formData) {
                 document.getElementsByTagName('input').value = "";
                 document.getElementsByTagName('textarea').value = "";
                 notifier(1, response.text);
-            } else {
-                notifier(0, "Failed to save");
+            } else if(response.type == "error"){
+                notifier(0, response.text);
+            }else{
+                notifier(0, "Error occured saving");
             }
         }
     }

@@ -49,6 +49,7 @@ function addAttribute(obj) {
             "<option value='date'>Date</option>" +
             "<option value='file'>File</option>" +
             "<option value='long text'>Long text</option>" +
+            "<option value='password'>Password</option>" +
             "<option value='select'>Select from</option>";
         attrType.className = "form-control";
         attrType.style = "margin-left:15px;margin-bottom:2px";
@@ -56,7 +57,7 @@ function addAttribute(obj) {
 
         //creating the label for the nullable selection
         var nullLabel = document.createElement("label");
-        nullLabel.innerHTML = "Nullable";
+        nullLabel.innerHTML = "N";
         nullLabel.className = "control-label";
         nullLabel.style = "margin-left:15px;margin-bottom:2px";
 
@@ -69,12 +70,31 @@ function addAttribute(obj) {
         radioLabelFalse.className = "checkbox-inline";
         radioLabelFalse.innerHTML = "<input type='radio' name='attr_nullable" + i + "' value='false'>False";
 
+        //creating the label for the uniqueness selection
+        var uniqueLabel = document.createElement("label");
+        uniqueLabel.innerHTML = "U";
+        uniqueLabel.className = "control-label";
+        uniqueLabel.style = "margin-left:15px;margin-bottom:2px";
+
+        //creating radio buttons
+        var radioLabelUniqueTrue = document.createElement("label");
+        radioLabelUniqueTrue.className = "checkbox-inline";
+        radioLabelUniqueTrue.innerHTML = "<input type='radio' name='attr_uniqueness" + i + "' value='true'>True";
+
+        var radioLabelUniqueFalse = document.createElement("label");
+        radioLabelUniqueFalse.className = "checkbox-inline";
+        radioLabelUniqueFalse.innerHTML = "<input type='radio' name='attr_uniqueness" + i + "' value='false'>False";
+
+
         //displaying the elements
         container.appendChild(name);
         container.appendChild(attrType);
-        container.appendChild(nullLabel);
+        container.appendChild(nullLabel);        
         container.appendChild(radioLabelTrue);
         container.appendChild(radioLabelFalse);
+        container.appendChild(uniqueLabel);
+        container.appendChild(radioLabelUniqueTrue);
+        container.appendChild(radioLabelUniqueFalse);
         //append line break
         container.appendChild(document.createElement("br"));
     }
@@ -110,6 +130,7 @@ function loadComboBox(obj) {
     } else if (obj.value == "none") {
         obj.innerHTML = "<option value=''>-- Select type --</option>" +
             "<option value='text'>Text</option>" +
+            "<option value='unique text'>Unique text</option>" +
             "<option value='numeric'>Numeric</option>" +
             "<option value='date'>Date</option>" +
             "<option value='file'>File</option>" +
@@ -121,12 +142,14 @@ function loadComboBox(obj) {
 function isDataTypeTable(dataType) {
     var isTable = false;
     if ((dataType != null) && (dataType != "text" &&
-            dataType != "numeric" &&
-            dataType != "date" &&
-            dataType != "file" &&
-            dataType != "long text" &&
-            dataType != "select" &&
-            dataType != "none")) {
+        dataType != "password" &&
+        dataType != "numeric" &&
+        dataType != "date" &&
+        dataType != "file" &&
+        dataType != "unique text" &&
+        dataType != "long text" &&
+        dataType != "select" &&
+        dataType != "none")) {
         isTable = true;
     }
     return isTable;

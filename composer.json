@@ -10,10 +10,10 @@
             "role": "Developer"
         }
     ],
-  "require": {
-    "ext-mysql": "*",
+  "require": {   
     "ext-gettext": "*",
-    "ext-mbstring":"*"
+    "ext-mbstring":"*",
+          "phpmailer/phpmailer": "^6.0"
   },  
    "require-dev": {
       "heroku/heroku-buildpack-php": "*"
