@@ -1239,13 +1239,14 @@ class subject extends main {
         $header = array("Title", "Created by", "Created on", "Last update");
         $tablecontent = null;
         try {
-            $subjectList = R::getAll("SELECT title,created_by,created_on,last_update FROM subject ORDER BY created_on DESC ");
+            $subjectList = R::getAll("SELECT id,title,created_by,created_on,last_update FROM subject ORDER BY created_on DESC ");
             for ($count = 0; $count < count($subjectList); $count++) {
                 $title = $subjectList[$count]['title'];
                 $createdBy = $subjectList[$count]['created_by'];
                 $createdOn = $subjectList[$count]['created_on'];
                 $lastUpdate = $subjectList[$count]['last_update'];
-                $tablecontent[$count] = array(1 => $title, 2 => $createdBy, 3 => $createdOn, 4 => $lastUpdate);
+                $tableActionTag = "subject-" . $subjectList[$count]['id'];
+                $tablecontent[$count] = array(0 => $tableActionTag, 1 => $title, 2 => $createdBy, 3 => $createdOn, 4 => $lastUpdate);
             }
             $this->displayTable($header, $tablecontent, null);
         } catch (Exception $e) {
@@ -1265,8 +1266,7 @@ class subject extends main {
                 $subjectTitle = R::getCell("SELECT title FROM subject WHERE id='$subjectId'");
                 if (isset($subjectTitle)) {
                     R::exec("DROP TABLE $subjectTitle");
-                    $tableDropped = $this->isTableExisting($subjectTitle);
-                    if ($tableDropped == true) {
+                    if ($this->isTableExisting($subjectTitle) === false) {
                         $attributeList = R::getAll("SELECT id,name,has_ref FROM attribute WHERE subject='$subjectId'");
                         for ($counter = 0; null !== $attributeList && $counter < count($attributeList); $counter++) {
                             $attributeId = $attributeList[$counter]['id'];
