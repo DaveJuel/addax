@@ -194,7 +194,7 @@ $("#register-form").on("submit", function (e) {
 //END REGISTER -------------
 
 //saving the form with ajax
-function saveData(obj) {
+function saveArticle(obj) {
     notifier(2, " Saving...", null);
     var subjectToSave = obj.id;
     var subjectCompositeId = subjectToSave.split("-");
@@ -210,8 +210,7 @@ function updateOccurence() {
     notifier(2, "Updating...", document.getElementById("update-notification"));
     var occurenceCompositeDetails = document.getElementById("update-instance-id").value;
     var occurenceSplitDetails = occurenceCompositeDetails.split("-");
-    var subjectTitle = occurenceSplitDetails[0];
-    var occurenceId = occurenceSplitDetails[1];
+    var subjectTitle = occurenceSplitDetails[0];   
     fetchDataToSave(subjectTitle, "update");
     document.getElementById("update-notification").innerHTML="";
 }
@@ -235,25 +234,25 @@ function deleteOccurence() {
 
 function fetchDataToSave(articleId, action) {
     var dataToPost;
-    if (articleId != null && action != null) {
+    if (null!== articleId&& null!== action) {
         //get attributes
         var attributeList = null;
-        if (articleId != null) {
+        if (null !== articleId) {
             var http = new XMLHttpRequest();
-            var url = "jsinterface";
+            var url = "../includes/interface.php";
             var params = "action=get_article_attributes&data-set=" + articleId;
             http.open("POST", url, true);
             http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             http.onreadystatechange = function () { //Call a function when the state changes.
-                if (http.readyState == 4 && http.status == 200) {
+                if (http.readyState === 4 && http.status === 200) {
                     var response = JSON.parse(http.responseText);
-                    if (response.type == "success") {
+                    if (response.type === "success") {
                         var hasFile = false;
                         attributeList = response.attributes;
                         /*
                         Need to make the action reflecting to the form generated
                         */                        
-                        if(action=="update"){
+                        if(action==="update"){
                             var occurenceCompositeDetails = document.getElementById("update-instance-id").value;
                             var occurenceSplitDetails = occurenceCompositeDetails.split("-");
                             var subjectTitle = occurenceSplitDetails[0];
@@ -268,7 +267,7 @@ function fetchDataToSave(articleId, action) {
                         for (var count = 0; count < attributeList.length; count++) {
                             var dataType = attributeList[count].type;
                             var dataTitle = attributeList[count].name;
-                            if (dataType == "file") {
+                            if (dataType === "file") {
                                 hasFile = true;
                                 fileObject = document.getElementById(action + "_" + dataTitle).files[0];
                             } else { //save other input types 
@@ -285,7 +284,7 @@ function fetchDataToSave(articleId, action) {
                     }
                 }
             }
-            http.send(params);
+            http.send(params);            
         }
     }
 }

@@ -54,11 +54,13 @@ class UIfeeders {
      * @param String $instance The instance to edit
      * @param String $field Description
      */
-    public function feedModal($instance, $subject) {
-        $this->instance = $instance;
-        $this->field = $subject;
+    public function feedModal($subject, $occurenceId) {
+        $subjectObj = new subject();
+        $subjectId = $subjectObj->getId($subject);
         $component = new main();
-        $component->formBuilder($subject, "update");
+        $component->subjectOccurenceId = $occurenceId;
+        $component->subjectTitle = $subject;
+        $component->formBuilder($subjectId, "update");
     }
 
     /**
@@ -308,7 +310,7 @@ class main extends UIfeeders {
      */
     private function tableAction($rowId) {
         echo "<td>" .
-        "<a class='btn btn-info' data-toggle='modal' data-target='#editModal' title='Edit' data-table_data='$rowId'>
+        "<a class='open-UpdateItemDialog btn btn-info' data-toggle='modal' data-target='#editModal' title='Edit' data-table_data='$rowId'>
 		 <i class='fa fa-pencil fa-fw'></i>
 		</a>  " . "  <a class='open-DeleteItemDialog btn btn-danger' data-toggle='modal' data-target='#deleteModal' title='Remove'  data-table_data='$rowId'>
 		<i class='fa fa-remove fa-fw'></i>
@@ -456,7 +458,7 @@ class main extends UIfeeders {
             }
             if ($caller == "add") {
                 echo "<div class='form-group'>";
-                echo "<input type='submit' class='btn btn-dark' id='save-article' onclick='saveArticle();' name='action' value='Save'>";
+                echo "<input type='submit' class='btn btn-dark' id='save-$subjectId' onclick='saveArticle(this);' name='action' value='Save'>";
                 echo "</div>";
             }
             echo "</form>";
@@ -472,7 +474,7 @@ class main extends UIfeeders {
      * @param String $name The name of the attribute
      */
     private function inputGenerator($id, $name, $type, $caller) {
-        if (isset($this->instance)) {
+        if (isset($this->subjectOccurenceId)) {
             $value = $this->getValue($name);
             $holder = "value";
         } else {
@@ -547,9 +549,9 @@ class main extends UIfeeders {
     private function getValue($col) {
         $value = "Not set";
         try {
-            $instance = $this->instance;
-            $field = $this->field;
-            $value = R::getCell("SELECT DISTINCT $col FROM $field WHERE id='$instance'");
+            $occurenceId = $this->subjectOccurenceId;
+            $subject = str_replace(" ", "_", $this->subjectTitle);
+            $value = R::getCell("SELECT DISTINCT $col FROM $subject WHERE id='$occurenceId'");
         } catch (Exception $e) {
             error_log("MAIN[getValue]:" . $e);
         }
@@ -1467,8 +1469,7 @@ class content extends main {
      * @param $values the values to modify
      * @param $attributes columns to be updated
      */
-    public function update($instanceId, $content, $values, $attributes)
-    {
+    public function update($instanceId, $content, $values, $attributes) {
         $response = null;
         if (isset($instanceId) && isset($content) && isset($values) && isset($attributes)) {
             try {
@@ -1480,10 +1481,12 @@ class content extends main {
                 for ($counter = 0; $counter < count($attributes); $counter++) {
                     $attribute = str_replace(" ", "_", $attributes[$counter]['name']);
                     $value = $values[$counter];
-                    if ($counter == 0) {
-                        $sqlUpdateString = $attribute . "='" . $value . "'";
-                    } else {
-                        $sqlUpdateString = $sqlUpdateString . "," . $attribute . "='" . $value . "'";
+                    if (isset($value)) {
+                        if ($counter == 0) {
+                            $sqlUpdateString = $attribute . "='" . $value . "'";
+                        } else {
+                            $sqlUpdateString = $sqlUpdateString . "," . $attribute . "='" . $value . "'";
+                        }
                     }
                 }
                 R::exec("UPDATE $content SET $sqlUpdateString WHERE id='$instanceId'");

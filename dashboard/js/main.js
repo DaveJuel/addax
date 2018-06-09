@@ -165,14 +165,18 @@ $(document).on("click", ".open-UpdateItemDialog", function (e) {
     feedEditModal(subject, occurenceId);
 });
 
-//Passing the id of the instance to be deleted
+//Passing the id of the instance alert(subject,occurenceId);
+// to be deleted
 $(document).on("click", ".open-DeleteItemDialog", function () {
     var instanceId = $(this).data('table_data');
     $(".modal-body #delete-instance-id").val(instanceId);
 });
 
 /**
- * 
+ * feedEditModal
+ * This function is to load the form in the displayed modal
+ * @param {String} subject the name of the table to update
+ * @param {Integer} occurence_id the id of the instance to be updated  
  */
 function feedEditModal(subject, occurence_id) {
     notifier(2, " Loading form", document.getElementById("update-notification"));
@@ -184,11 +188,13 @@ function feedEditModal(subject, occurence_id) {
         xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
     xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
             var response = xmlhttp.responseText;
-            if (response != null) {
+            if (null !== response) {
                 document.getElementById("update-notification").innerHTML = "";
                 document.getElementById("modal-form-holder").innerHTML = response;
+            } else {
+                notifier(0, "Internal error", document.getElementById("update-notification"));
             }
         }
     };

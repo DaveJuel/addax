@@ -179,7 +179,7 @@ switch ($action) {
         $isDataValid = true;
         $validationError = "";
         $values = array();
-        $articleId = $_REQUEST['article'];
+        $articleId = $_REQUEST['data-set'];
         $attributes = $subject->getAttributes($articleId);
         if (count($attributes) > 0) {
             //getting form values
@@ -230,19 +230,13 @@ switch ($action) {
                 $attributeName = str_replace("_", " ", $attributes[$count]['name']);
                 $nullProperty = $attributes[$count]['is_null'];
                 $uniqueProperty = $attributes[$count]['is_unique'];
-                if ($nullProperty == "false" && empty($_REQUEST[$attributes[$count]['name']])) {
+                if ($nullProperty == "false" && empty($_REQUEST[$attributes[$count]['name']]) && $attributes[$count]['type'] !== "file") {
                     $isDataValid = false;
                     $main->status = $main->feedbackFormat(0, $attributeName . " is required");
                     die($main->status);
-                } else if ($uniqueProperty == "true" && $validation->isUnique($main->header($subjectId), $attributes[$count]['name'], $_REQUEST[$attributes[$count]['name']]) != true) {
-                    $isDataValid = false;
-                    $main->status = $main->feedbackFormat(0, $attributeName . " must be unique, and " . $_REQUEST[$attributes[$count]['name']] . " is already saved");
-                    die($main->status);
                 } else {
-                    if ($attributes[$count]['type'] == "file" && null !== $_FILES[$attributes[$count]['name']]) {
-                        $file = $_FILES[$attributes[$count]['name']];
-                        $fileHandler->upload($file);
-                        $values[$count] = $fileHandler->filePath;
+                    if ($attributes[$count]['type'] == "file") {
+                        $values[$count] = NULL;
                     } else {
                         $values[$count] = $_REQUEST[$attributes[$count]['name']];
                     }
@@ -283,9 +277,9 @@ switch ($action) {
         }
         break;
     case 'feed_modal':
-        $instance = $_REQUEST['instance'];
-        $field = $_REQUEST['field'];
-        $main->feedModal($instance, $field);
+        $occurenceId = $_REQUEST['occurence_id'];
+        $subject = $_REQUEST['subject'];
+        $main->feedModal($subject, $occurenceId);
         break;
     case 'add_file':
         $file = $_FILES['image'];
@@ -293,9 +287,14 @@ switch ($action) {
         die($result);
         break;
     case 'get_article_attributes':
-        if (isset($_REQUEST['article_id'])) {
-            $articleId = $_REQUEST['article_id'];
-            $attributeList = $subject->getAttributes($articleId);
+        if (isset($_REQUEST['data-set'])) {
+            $articleId = $_REQUEST['data-set'];
+            if (is_numeric($articleId)) {
+                $attributeList = $subject->getAttributes($articleId);
+            } else {
+                $articleId = $subject->getId($articleId);
+                $attributeList = $subject->getAttributes($articleId);
+            }
             if (count($attributeList) > 0) {
                 $main->status = json_encode(array('type' => 'success', 'attributes' => $attributeList));
             } else {
