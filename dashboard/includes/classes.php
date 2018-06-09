@@ -21,8 +21,8 @@ R::ext('xdispense', function ($type) {
 });
 
 $main = new main();
-class UIfeeders
-{
+
+class UIfeeders {
 
     public $instance;
     public $field;
@@ -36,8 +36,7 @@ class UIfeeders
      * @param String $defValue The value to hold
      * @param String $defDisplay The value to display
      */
-    public function comboBuilder($content, $defValue, $defDisplay)
-    {
+    public function comboBuilder($content, $defValue, $defDisplay) {
         if (count($content) > 1) {
             echo "<option>-- Select " . strtolower(str_replace("_", " ", $defValue)) . "--</option>";
         }
@@ -55,8 +54,7 @@ class UIfeeders
      * @param String $instance The instance to edit
      * @param String $field Description
      */
-    public function feedModal($instance, $subject)
-    {
+    public function feedModal($instance, $subject) {
         $this->instance = $instance;
         $this->field = $subject;
         $component = new main();
@@ -68,8 +66,7 @@ class UIfeeders
      * <p>Verifies if datatype is table</p>
      * @param String $dataType The data type to be verified
      */
-    public function isDataTypeTable($dataType)
-    {
+    public function isDataTypeTable($dataType) {
         $isTable = false;
         $mainObj = new main();
         $schema = $mainObj->dbname;
@@ -97,8 +94,7 @@ class UIfeeders
      * <p>Verifies if datatype is column</p>
      * @param String $dataType the data type to be verified
      */
-    public function isDataTypeColumn($dataType)
-    {
+    public function isDataTypeColumn($dataType) {
         $isColumn = false;
         $mainObj = new main();
         $schema = $mainObj->dbname;
@@ -128,12 +124,11 @@ class UIfeeders
      * <p>Verifies if data type is valid</p>
      * @param String $dataType the data type to be verified
      */
-    public function isDataTypeDefault($dataType)
-    {
+    public function isDataTypeDefault($dataType) {
         $isDefault = false;
         $dataType = strtolower($dataType);
         if (isset($dataType) &&
-            ($dataType == "text" || $dataType == "numeric" || $dataType == "date") || $dataType == "file" || $dataType == "unique text" || $dataType == "long text" || $dataType == "password") {
+                ($dataType == "text" || $dataType == "numeric" || $dataType == "date") || $dataType == "file" || $dataType == "unique text" || $dataType == "long text" || $dataType == "password") {
             $isDefault = true;
         }
         return $isDefault;
@@ -146,15 +141,13 @@ class UIfeeders
  * <p>This is the main method with all utilities used by the application.</p>
  * <p>It extends {@link UIfeeders The class that handles UI content}</p>
  */
-class main extends UIfeeders
-{
+class main extends UIfeeders {
 
     public $status;
     public $appName = APP_NAME;
     public $author = APP_AUTHOR;
 
-    public function __construct()
-    {
+    public function __construct() {
         $connection = new connection();
         $this->dbname = $connection->db;
     }
@@ -165,8 +158,7 @@ class main extends UIfeeders
      * @param Integer $status The status of the message
      * @param String $text the message to be displayed on the screen
      */
-    public function feedbackFormat($status, $text)
-    {
+    public function feedbackFormat($status, $text) {
         $feedback = "";
         /*
          * status = 0 => failure
@@ -190,8 +182,7 @@ class main extends UIfeeders
         return $feedback;
     }
 
-    public function displayMessageTable($header, $message, $action)
-    {
+    public function displayMessageTable($header, $message, $action) {
         /*
          * Start table
          */
@@ -265,8 +256,7 @@ class main extends UIfeeders
      * @param Array $body Content of the table
      * @param Boolean $action Set to true to activate editing or delete
      */
-    public function displayTable($header, $body, $action)
-    {
+    public function displayTable($header, $body, $action) {
         /*
          * start table
          */
@@ -298,7 +288,7 @@ class main extends UIfeeders
             }
             //action
             if (!isset($action) || $action == true) {
-                $this->tableAction($body[$row][1]);
+                $this->tableAction($body[$row][0]);
             }
             echo "</tr>";
         }
@@ -316,15 +306,14 @@ class main extends UIfeeders
      * <p>This method defines the action on each table item.</p>
      * @param Integer $rowId The  id of the item on the table ID
      */
-    private function tableAction($rowId)
-    {
+    private function tableAction($rowId) {
         echo "<td>" .
-            "<a class='btn btn-info' data-toggle='modal' data-target='#editModal' title='Edit' data-table_data='$rowId'>
+        "<a class='btn btn-info' data-toggle='modal' data-target='#editModal' title='Edit' data-table_data='$rowId'>
 		 <i class='fa fa-pencil fa-fw'></i>
 		</a>  " . "  <a class='open-DeleteItemDialog btn btn-danger' data-toggle='modal' data-target='#deleteModal' title='Remove'  data-table_data='$rowId'>
 		<i class='fa fa-remove fa-fw'></i>
 		</a>" .
-            "</td>";
+        "</td>";
     }
 
     /**
@@ -332,8 +321,7 @@ class main extends UIfeeders
      * <p>This is the method that generates links for the application.</p>
      * @param String $action This is the action assigned to the link.
      */
-    public function makeLinks($action)
-    {
+    public function makeLinks($action) {
         try {
             $userObj = new user();
             if (isset($_SESSION["username"]) && $userObj->getUserType($_SESSION["username"]) == "author") {
@@ -362,8 +350,7 @@ class main extends UIfeeders
      * <p>This is the method to display the header of the page</p>
      * @param Int $subject The ID of the subject to refer to.
      */
-    public function header($subject)
-    {
+    public function header($subject) {
         $head = "";
         try {
             $subject = $subject;
@@ -383,8 +370,7 @@ class main extends UIfeeders
      * creating tabs
      *
      */
-    public function tabBuilder($subjectTitle)
-    {
+    public function tabBuilder($subjectTitle) {
         if (isset($subjectTitle)) {
             $subjectObj = new subject();
             $tabsList = $subjectObj->getChildSubjectList($subjectTitle);
@@ -396,8 +382,7 @@ class main extends UIfeeders
      * Creating tabs
      *
      */
-    private function tabCreator($tabsList)
-    {
+    private function tabCreator($tabsList) {
         if (null !== $tabsList && count($tabsList) > 0) {
             for ($counter = 0; $counter < count($tabsList); $counter++) {
                 $isActive = "";
@@ -409,7 +394,6 @@ class main extends UIfeeders
                 echo '<a href="#' . $tabsList[$counter]['title'] . '" data-toggle="tab">' . $tabTitle . '</a>';
                 echo '</li>';
             }
-
         }
     }
 
@@ -419,8 +403,7 @@ class main extends UIfeeders
      * @param Integer $subjectId This the ID of the subject being viewed
      * @param String $caller The calling environment
      */
-    public function formBuilder($subjectId, $caller)
-    {
+    public function formBuilder($subjectId, $caller) {
 
         $title = "";
         try {
@@ -452,8 +435,7 @@ class main extends UIfeeders
      * <h1>formInterface</h1>
      * making the form structure
      */
-    private function formInterface($subject, $subjectId, $caller)
-    {
+    private function formInterface($subject, $subjectId, $caller) {
         $built = false;
         $attrNumber = $subject[0]['attr_number'];
         $subjectObj = new subject();
@@ -489,8 +471,7 @@ class main extends UIfeeders
      * <p>Generates the input for attributes with default datatypes</p>
      * @param String $name The name of the attribute
      */
-    private function inputGenerator($id, $name, $type, $caller)
-    {
+    private function inputGenerator($id, $name, $type, $caller) {
         if (isset($this->instance)) {
             $value = $this->getValue($name);
             $holder = "value";
@@ -531,8 +512,7 @@ class main extends UIfeeders
         echo "<div class='input-group'>" . $formInput . "</div>";
     }
 
-    private function referentialDataInputGenerator($id, $name, $type, $caller)
-    {
+    private function referentialDataInputGenerator($id, $name, $type, $caller) {
         $input = "";
         $optionString = "";
         if (isset($id) && isset($name) && isset($type)) {
@@ -564,8 +544,7 @@ class main extends UIfeeders
      * <h1>feedFormValues</h1>
      * <p>This method is to set values to feed the built form.</p>
      */
-    private function getValue($col)
-    {
+    private function getValue($col) {
         $value = "Not set";
         try {
             $instance = $this->instance;
@@ -578,8 +557,7 @@ class main extends UIfeeders
     }
 
     //BUILDING THE SELECT
-    public function fetchBuilder($table, $columnList)
-    {
+    public function fetchBuilder($table, $columnList) {
         $result = null;
         $query = "";
         //building the syntax
@@ -599,7 +577,7 @@ class main extends UIfeeders
             $rows = array();
             for ($count = 0; $count < count($values); $count++) { //feed row
                 $columns = array();
-                $columns[0] = $values[$count]['id'];
+                $columns[0] = $table . "-" . $values[$count]['id'];
                 for ($inner = 1; $inner <= count($columnList); $inner++) { //feed column
                     $columns[$inner] = $values[$count][str_replace(" ", "_", $columnList[$inner - 1]['name'])];
                 }
@@ -616,8 +594,7 @@ class main extends UIfeeders
     }
 
     //loading the list of tables
-    public function getTables($showCombo)
-    {
+    public function getTables($showCombo) {
         $tableList = null;
         try {
             $mainObj = new main();
@@ -639,8 +616,7 @@ class main extends UIfeeders
      * </p>
      * @param String $tableName The name of the table to be specified
      */
-    public function getTableColumns($tableName)
-    {
+    public function getTableColumns($tableName) {
         $columnList = null;
         try {
             $dbname = $this->dbname;
@@ -669,12 +645,33 @@ class main extends UIfeeders
         }
     }
 
+    /**
+     * isTableExisting
+     * Verifies if the tables is available and returns false or true
+     * @param String  $tableName The name of the table you want to check
+     */
+    public function isTableExisting($tableName) {
+        $tableExists = false;
+        if (isset($tableName)) {
+            $tableList = $this->getTables(false);
+            //verify if table is dropped
+            for ($counter = 0; null !== $tableList && $counter < count($tableList); $counter++) {
+                if ($tableList[$counter]['table_name'] == $tableName) {
+                    $tableExists = TRUE;
+                    break;
+                }
+            }
+        } else {
+            error_log("ERROR(isTableExisting): unable to verify no table specified");
+        }
+        return $tableExists;
+    }
+
     /*
      * validating the numbers
      */
 
-    public function standardize($phone)
-    {
+    public function standardize($phone) {
         if (strlen($phone) == 10) {
             $phone = "25" . $phone;
         } else if (strlen($phone) == 9) {
@@ -690,8 +687,7 @@ class main extends UIfeeders
 }
 
 //user object
-class user extends main
-{
+class user extends main {
 
     public $fname;
     public $lname;
@@ -705,8 +701,7 @@ class user extends main
     public $count;
     public $userlist = [];
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->count();
     }
 
@@ -714,8 +709,7 @@ class user extends main
      * <h1>fetch</h1>
      * <p>Counting the user of the system</p>
      */
-    public function count()
-    {
+    public function count() {
         $users = [];
         if (isset($_SESSION['username'])) {
             $username = $_SESSION['username'];
@@ -743,7 +737,6 @@ class user extends main
                     } else {
                         $this->count = "N/A";
                     }
-
                 } catch (Exception $e) {
                     error_log("ERROR(USER:COUNT):" . $e);
                 }
@@ -752,8 +745,7 @@ class user extends main
     }
 
     //getting the user
-    public function userList()
-    {
+    public function userList() {
         $header = array('No', 'Names', 'Email', 'Tel', 'Category');
         try {
             $type = $_SESSION["type"];
@@ -796,8 +788,7 @@ class user extends main
      * @param $lname the last name of the user
      * @param $oname Other name of the user
      */
-    public function add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type)
-    {
+    public function add($fname, $lname, $oname, $email, $tel, $address, $username, $password, $type) {
         $isCreated = false;
         if ($this->isUsernameValid($username)) {
             //saving user credentials
@@ -823,8 +814,7 @@ class user extends main
         return $isCreated;
     }
 
-    private function addCredentials($id, $username, $password, $type)
-    {
+    private function addCredentials($id, $username, $password, $type) {
         $isCreated = false;
         try {
             $user_credentials = R::dispense("credentials");
@@ -848,8 +838,7 @@ class user extends main
         return $isCreated;
     }
 
-    public function initialGrant($userEmail, $passcode)
-    {
+    public function initialGrant($userEmail, $passcode) {
         $initial = 1;
         if (null !== getenv("ADDAX_AUTHOR") && null !== getenv("ADDAX_PASSCODE")) {
             if ($userEmail === getenv("ADDAX_AUTHOR") && $passcode === getenv("ADDAX_PASSCODE")) {
@@ -860,13 +849,12 @@ class user extends main
     }
 
     /**
-     *<h1>isValid</h1>
-     *<p>This function validates id the username is valid for registration</p>
+     * <h1>isValid</h1>
+     * <p>This function validates id the username is valid for registration</p>
      * @param $username The user name to validate.
      * @return Boolean
      */
-    public function isUsernameValid($username)
-    {
+    public function isUsernameValid($username) {
         $status = true;
         try {
             $check = R::getCol("SELECT id FROM credentials WHERE username='$username'");
@@ -886,8 +874,7 @@ class user extends main
      * @param $email the email to verify.
      * @return boolean true if email is valid
      */
-    public function isEmailValid($email)
-    {
+    public function isEmailValid($email) {
         $status = true;
         if (strpos($email, "@") === false || strpos($email, ".")) {
             $status = false;
@@ -907,9 +894,9 @@ class user extends main
         }
         return $status;
     }
+
     //evaluating logged in user
-    private function evalLoggedUser($id, $u)
-    {
+    private function evalLoggedUser($id, $u) {
         //getting the logged in user information
         try {
             $logged_user = R::getRow("SELECT id FROM credentials WHERE user_id = {$id} AND username ='{$u}'  AND user_status='1'");
@@ -927,8 +914,7 @@ class user extends main
      * <p>This function verifies if the user is logged in</p>
      * @return Boolean
      */
-    public function checkLogin()
-    {
+    public function checkLogin() {
         $user_ok = false;
         $user_id = "";
         $log_usename = "";
@@ -949,13 +935,12 @@ class user extends main
     }
 
     /**
-     *<h1>login</h1>
-     *<p>This is the function to login the user</p>
+     * <h1>login</h1>
+     * <p>This is the function to login the user</p>
      * @param $username the username of the user
      * @param $password the password of the user
      */
-    public function login($username, $password)
-    {
+    public function login($username, $password) {
         $password = md5($password);
         try {
             $user = R::getRow("SELECT credentials.user,user_profile.id,username,password,type FROM credentials JOIN user_profile ON credentials.user=user_profile.id WHERE username='$username' AND password='$password'");
@@ -988,8 +973,7 @@ class user extends main
     /**
      * Return the user type of the logged in user
      */
-    public function getUserType($username)
-    {
+    public function getUserType($username) {
         $userType = null;
         if ($username) {
             try {
@@ -1012,8 +996,7 @@ class user extends main
      * This function checks if the user is allowed to do the subject.
      * @param $toDo What the user needs
      */
-    public function isUserAllowed($toDo, $subject)
-    {
+    public function isUserAllowed($toDo, $subject) {
         $isAllowed = false;
         if (isset($_SESSION['username'])) {
             $username = $_SESSION['username'];
@@ -1042,8 +1025,7 @@ class user extends main
         return $isAllowed;
     }
 
-    public function listRoleInOption()
-    {
+    public function listRoleInOption() {
         try {
             $userType = $this->getUserType($_SESSION['username']);
             $roleDetails = R::getAll("SELECT id,title FROM role");
@@ -1054,14 +1036,14 @@ class user extends main
             error_log("Unable to read list of roles.");
         }
     }
+
     /**
      * <h1>getUserDetails</h1>
      * <p>This method is to fetch information of the user.</p>
      * @param Int $username The user id
      * @return Array Returns an array that contains all user information.
      */
-    public function getUserDetails($username)
-    {
+    public function getUserDetails($username) {
         $user = null;
         try {
             $user = R::getRow("SELECT user_profile.id,fname,lname,oname,email,phone,address,credentials.user,credentials.type,credentials.username FROM user_profile INNER JOIN credentials ON user_profile.id=credentials.user WHERE user_profile.id='$username'");
@@ -1083,8 +1065,7 @@ class user extends main
  * THE SUBJECT CLASS
  * */
 
-class subject extends main
-{
+class subject extends main {
 
     public $status = "";
     public $subjectId = null;
@@ -1092,8 +1073,7 @@ class subject extends main
     public $attributes = [];
 
     //adding a new content
-    public function add($subjTitle, $type, $subjAttrNumber, $subjAttributes, $subjCommenting, $subjLikes, $subjDisplayViews)
-    {
+    public function add($subjTitle, $type, $subjAttrNumber, $subjAttributes, $subjCommenting, $subjLikes, $subjDisplayViews) {
 
         if ($this->isValid($subjTitle) && $subjTitle != 'subject') {
             try {
@@ -1135,8 +1115,7 @@ class subject extends main
     /**
      * Adding the subject attributes.
      */
-    private function createAttributes($attributes)
-    {
+    private function createAttributes($attributes) {
         $isCreated = false;
         if (isset($this->subjectId)) {
             try {
@@ -1167,8 +1146,7 @@ class subject extends main
      * @param Integer $attributeId The ID of the attribute creating the reference
      * @param String $referenceName The name of reference
      */
-    public function createReference($attributeId, $referenceName)
-    {
+    public function createReference($attributeId, $referenceName) {
         $isCreated = false;
         if (isset($attributeId)) {
             try {
@@ -1191,8 +1169,7 @@ class subject extends main
      * <p>This method is to read the references of the specified attributes</p>
      * @param Integer $attrId The id of the attribute.
      */
-    public function readReference($attrId)
-    {
+    public function readReference($attrId) {
         $reference = null;
         if (isset($attrId)) {
             try {
@@ -1205,8 +1182,7 @@ class subject extends main
     }
 
     //checking the existence of a subject
-    public function getId($title)
-    {
+    public function getId($title) {
         $id = null;
         try {
             $id = R::getCell("SELECT id FROM subject WHERE title='$title'");
@@ -1218,8 +1194,7 @@ class subject extends main
     }
 
     //checking the existence of a subject
-    public function isValid($title)
-    {
+    public function isValid($title) {
         $status = true;
         try {
             $check = R::getCol("SELECT id FROM subject WHERE title='$title'");
@@ -1236,8 +1211,7 @@ class subject extends main
     /**
      * returns the attributes of a given subject
      */
-    public function getAttributes($subject)
-    {
+    public function getAttributes($subject) {
         $response = array();
         try {
             $attributeList = R::getAll("SELECT id,name,data_type,is_null,is_unique FROM attribute WHERE subject='$subject'");
@@ -1259,8 +1233,7 @@ class subject extends main
     }
 
     //GET LIST OF REGISTERED SUBJECTS
-    public function getList()
-    {
+    public function getList() {
         $header = array("Title", "Created by", "Created on", "Last update");
         $tablecontent = null;
         try {
@@ -1281,51 +1254,53 @@ class subject extends main
     /**
      * delete
      * This method deleted the subject specified
+     * @param String The title of the subject.
      */
-    public function delete($subjectTitle)
-    {
-        $subjectId = $this->getId($subjectTitle);
+    public function delete($subjectId) {
+        $isDeleted = false;
         if (isset($subjectId)) {
             try {
-                $tableDropped = false;
                 $subjectTitle = R::getCell("SELECT title FROM subject WHERE id='$subjectId'");
                 if (isset($subjectTitle)) {
-                    $tableDropped = R::exec("DROP TABLE $subjectTitle");
-                }
-                if (true) {
-                    $attributeList = R::getAll("SELECT id,name,has_ref FROM attribute WHERE subject='$subjectId'");
-                    for ($counter = 0; null !== $attributeList && $counter < count($attributeList); $counter++) {
-                        $attributeId = $attributeList[$counter]['id'];
-                        if ($attributeList[$counter]['has_ref']) {
-                            R::exec("DELETE FROM reference WHERE attribute='$attributeId'");
-                            R::exec("DELETE FROM attribute WHERE id='$attributeId'");
-                        } else {
-                            R::exec("DELETE FROM attribute WHERE id='$attributeId'");
+                    R::exec("DROP TABLE $subjectTitle");
+                    $tableDropped = $this->isTableExisting($subjectTitle);
+                    if ($tableDropped == true) {
+                        $attributeList = R::getAll("SELECT id,name,has_ref FROM attribute WHERE subject='$subjectId'");
+                        for ($counter = 0; null !== $attributeList && $counter < count($attributeList); $counter++) {
+                            $attributeId = $attributeList[$counter]['id'];
+                            if ($attributeList[$counter]['has_ref'] == true) {
+                                R::exec("DELETE FROM reference WHERE attribute='$attributeId'");
+                                R::exec("DELETE FROM attribute WHERE id='$attributeId'");
+                            } else {
+                                R::exec("DELETE FROM attribute WHERE id='$attributeId'");
+                            }
                         }
-                    }
-                    R::exec("DELETE FROM subject WHERE id='$subjectId'");
-                    $subjectId = $this->getId($subjectTitle);
-                    if (!isset($subjectId)) {
-                        $this->status = $this->feedbackFormat(1, "Subject deleted successfully");
+                        R::exec("DELETE FROM subject WHERE id='$subjectId'");
+                        $subjectId = $this->getId($subjectTitle);
+                        if (!isset($subjectId)) {
+                            $isDeleted = true;
+                            $this->status = $this->feedbackFormat(1, "Subject deleted successfully");
+                        } else {
+                            $this->status = $this->feedbackFormat(0, "Unable to delete subject");
+                        }
                     } else {
-                        $this->status = $this->feedbackFormat(0, "Unable to delete subject");
+                        error_log("Unable to drop table $subjectTitle");
+                        $this->status = $this->feedbackFormat(0, "Unable to delete the subject (the table can't be dropped)");
                     }
-                } else {
-                    $this->status = $this->feedbackFormat(0, "Unable to delete the subject (the table can't be dropped)");
                 }
-
             } catch (Exception $e) {
                 error_log("SUBJECT:DELETE" . $e);
                 $this->status = $this->feedbackFormat(0, "Error occured");
             }
         } else {
             $this->status = $this->feedbackFormat(0, "Subject not specified");
+            error_log("Unable to read the ID of the subject title specified.");
         }
         die($this->status);
+        return $isDeleted;
     }
 
-    public function loadContainerCombo()
-    {
+    public function loadContainerCombo() {
         try {
             $parentCombo = R::getCol("SELECT title FROM subject WHERE type='container'");
             for ($counter = 0; null !== $parentCombo && $counter < count($parentCombo); $counter++) {
@@ -1336,8 +1311,7 @@ class subject extends main
         }
     }
 
-    public function getSubjectType($articleId)
-    {
+    public function getSubjectType($articleId) {
         $type = null;
         if (isset($articleId)) {
             try {
@@ -1349,8 +1323,7 @@ class subject extends main
         return $type;
     }
 
-    public function getChildSubjectList($parentName)
-    {
+    public function getChildSubjectList($parentName) {
         $childList = null;
         try {
             $childList = R::getAll("SELECT id,title FROM subject WHERE type='$parentName'");
@@ -1365,14 +1338,12 @@ class subject extends main
 /**
  * THE CONTENT CLASS
  */
-class content extends main
-{
+class content extends main {
 
     public $status = "";
 
     //register a new article
-    public function register($subjectTitle, $attributes)
-    {
+    public function register($subjectTitle, $attributes) {
         $status = false;
         try {
             $subjectTitle = str_replace(" ", "_", $subjectTitle);
@@ -1405,8 +1376,7 @@ class content extends main
     }
 
     //adding a new article content
-    public function add($content, $values, $attributes)
-    {
+    public function add($content, $values, $attributes) {
         try {
             $content = str_replace(" ", "_", $content);
             $article = R::xdispense($content);
@@ -1434,8 +1404,7 @@ class content extends main
      * <p>This function is to return the list of articles in table view.</p>
      * @param Integer $subjectId The ID of the subject in consideration.
      */
-    public function getList($subjectId)
-    {
+    public function getList($subjectId) {
         /*
          * initializing the function
          */
@@ -1458,16 +1427,81 @@ class content extends main
         }
     }
 
-    //editting an article
-    public function edit()
-    {
+    /**
+     * delete
+     * This function deletes the specified instance in the table
+     * @param $content the name of the table holding the value to be deleted
+     * @param $instanceId The id of the value to be deleted
+     */
+    public function delete($content, $instanceId) {
+        $isDeleted = false;
+        if (isset($content) && isset($instanceId)) {
+            try {
+                R::exec("DELETE FROM $content WHERE id='$instanceId'");
+                //verify if deleted
+                $deletedId = R::getCell("SELECT id FROM $content WHERE id='$instanceId'");
+                if (isset($deletedId)) {
+                    error_log("ERROR(delete): Failed to delete instance($instanceId) from $content");
+                    $this->status = $this->feedbackFormat(0, "Failed to delete the subject");
+                } else {
+                    $isDeleted = true;
+                    $this->status = $this->feedbackFormat(1, "Successfully deleted!");
+                }
+            } catch (Exception $exc) {
+                error_log("ERROR(delete)" . $exc);
+                $this->status = $this->feedbackFormat(0, "Error occured deleting the content");
+            }
+        } else {
+            error_log("ERROR(delete):Missing input");
+            $this->status = $this->feedbackFormat(0, "Missing inputs");
+        }
+        die($this->status);
+        return $isDeleted;
+    }
 
+    /**
+     * update
+     * This function is to update the content of a given table
+     * @param $instanceId the ID of the occurence to be update
+     * @param $content the table to be updated
+     * @param $values the values to modify
+     * @param $attributes columns to be updated
+     */
+    public function update($instanceId, $content, $values, $attributes)
+    {
+        $response = null;
+        if (isset($instanceId) && isset($content) && isset($values) && isset($attributes)) {
+            try {
+                $updateTime = date("d-m-Y h:m:s");
+                //keep last update time records
+                $content = str_replace(" ", "_", $content);
+                R::exec("UPDATE subject SET last_update='$updateTime' WHERE title='$content' ");
+                $sqlUpdateString = "";
+                for ($counter = 0; $counter < count($attributes); $counter++) {
+                    $attribute = str_replace(" ", "_", $attributes[$counter]['name']);
+                    $value = $values[$counter];
+                    if ($counter == 0) {
+                        $sqlUpdateString = $attribute . "='" . $value . "'";
+                    } else {
+                        $sqlUpdateString = $sqlUpdateString . "," . $attribute . "='" . $value . "'";
+                    }
+                }
+                R::exec("UPDATE $content SET $sqlUpdateString WHERE id='$instanceId'");
+                $response = $this->feedbackFormat(1, "Updated successfully");
+            } catch (Exception $exc) {
+                error_log("ERROR(update): " . $exc);
+                $response = $this->feedbackFormat(0, "Error occured updating " . str_replace("_", " ", $content));
+            }
+        } else {
+            error_log("ERROR(update):Missing inputs");
+            $response = $this->feedbackFormat(0, "Missing inputs");
+        }
+        return $response;
     }
 
     //adding a comment
-    public function comment()
-    {
-
+    public function comment() {
+        
     }
 
 }
@@ -1477,8 +1511,7 @@ class content extends main
  * <p>This is the class to handle the communication through the system</p>
  *
  */
-class message extends main
-{
+class message extends main {
 
     public $count = 0;
     public $head = "No new message.";
@@ -1491,8 +1524,7 @@ class message extends main
     public $receiver;
     public $createdOn;
 
-    public function __construct()
-    {
+    public function __construct() {
         $user = new user();
         $this->notRead = [];
         $this->sent = [];
@@ -1507,8 +1539,7 @@ class message extends main
      * <h1>send</h1>
      * <p>This is the method to send messages through the system</p>
      */
-    public function send($sender, $email, $message)
-    {
+    public function send($sender, $email, $message) {
         $fullname = explode(" ", $sender);
         if (isset($fullname[0]) && isset($fullname[1])) {
             $fname = $fullname[0];
@@ -1543,7 +1574,7 @@ class message extends main
             $this->status = $this->feedbackFormat(1, "Message sent successfully!");
         } catch (Exception $e) {
             $this->status = $this->feedbackFormat(0, "Unable to post message!");
-            error_log("ERROR(web:postContactMessage)"+$e);
+            error_log("ERROR(web:postContactMessage)" + $e);
         }
         die($this->status);
     }
@@ -1552,8 +1583,7 @@ class message extends main
      * <h1>count</h1>
      * <p>This is the method count message.</p>
      */
-    public function count()
-    {
+    public function count() {
         $userObj = new user();
         $username = $_SESSION['username'];
         $message = ["sent" => 0, "received" => 0, "not read" => 0];
@@ -1573,8 +1603,7 @@ class message extends main
      * <h1>receive</h1>
      * <p>This is the method to display received messages</p>
      */
-    public function receive()
-    {
+    public function receive() {
         $received = $this->received;
         if (count($received) > 0) {
             $this->displayMessageTable(null, $received, "read");
@@ -1587,8 +1616,7 @@ class message extends main
      * <h1>read</h1>
      * <p>This function is to read the content of the message</p>
      */
-    public function read($messageId)
-    {
+    public function read($messageId) {
 
         $received = $this->received;
         for ($count = 0; $count < count($received); $count++) {
@@ -1609,8 +1637,7 @@ class message extends main
         }
     }
 
-    private function alertDisplayFormat($messageDetails)
-    {
+    private function alertDisplayFormat($messageDetails) {
         echo '<li>
                     <a href="' . $messageDetails['link'] . '">
                         <div class="msg-img"><div class="online off"></div><img class="img-circle" src="../images/noimage-team.png" alt=""></div>
@@ -1621,8 +1648,7 @@ class message extends main
                 </li>';
     }
 
-    private function fetch()
-    {
+    private function fetch() {
         $userObj = new user();
         $username = $_SESSION['username'];
         $userType = $userObj->getUserType($username);
@@ -1665,8 +1691,7 @@ class message extends main
         }
     }
 
-    public function alert()
-    {
+    public function alert() {
         try {
             $notRead = $this->notRead;
             for ($count = 0; $count < count($notRead); $count++) {
@@ -1690,8 +1715,7 @@ class message extends main
      * <h1>send</h1>
      * <p>This is the method to send an email </p>
      */
-    public function sendEmail($reciever)
-    {
+    public function sendEmail($reciever) {
         $isSent = false;
         $mail = new PHPMailer\PHPMailer\PHPMailer();
         $mail->From = "davejuelz@gmail.com";
@@ -1717,8 +1741,7 @@ class message extends main
  * <h1>notification</h1>
  * <p>This class is to handle notification</p>
  */
-class notification extends main
-{
+class notification extends main {
 
     /**
      * To count the number of notifications
@@ -1731,8 +1754,7 @@ class notification extends main
     public $content;
     public $createdOn;
 
-    public function __construct()
-    {
+    public function __construct() {
         $user = new user();
         if ($user->checkLogin()) {
             $this->count();
@@ -1744,8 +1766,7 @@ class notification extends main
      * <h1>alertDisplayFormat</h1>
      * <p>This method is the build the format of an alert</p>
      */
-    private function alertDisplayFormat($notificationDetails)
-    {
+    private function alertDisplayFormat($notificationDetails) {
         echo ' <li>
                     <a href="' . $notificationDetails['link'] . '">
                         <div class="task-icon badge badge-success"><i class="icon-pin"></i></div>
@@ -1755,8 +1776,7 @@ class notification extends main
                 </li>';
     }
 
-    public function alert()
-    {
+    public function alert() {
         $userObj = new user();
         if (isset($_SESSION['username'])) {
             $username = $_SESSION['username'];
@@ -1794,8 +1814,7 @@ class notification extends main
      * <p>This method is to notify about recent activity</p>
      * @param
      */
-    public function add($notificationDetails)
-    {
+    public function add($notificationDetails) {
         if (isset($notificationDetails) && count($notificationDetails) > 0) {
             //get all values
             $notification = R::dispense("notification");
@@ -1818,8 +1837,7 @@ class notification extends main
      * <h1>count</h1>
      * <p>This method is to count the number of notification</p>
      */
-    public function count()
-    {
+    public function count() {
         $userObj = new user();
         $username = $_SESSION['username'];
         $userType = $userObj->getUserType($username);
@@ -1845,8 +1863,7 @@ class notification extends main
         }
     }
 
-    public function fetch()
-    {
+    public function fetch() {
         $userObj = new user();
         $username = $_SESSION['username'];
         $userType = $userObj->getUserType($username);
@@ -1896,8 +1913,7 @@ class notification extends main
      * <h1>read</h1>
      * <p>This function is to read the content of the notification</p>
      */
-    public function read($messageId)
-    {
+    public function read($messageId) {
         $notified = $this->notified;
         for ($count = 0; $count < count($notified); $count++) {
             if ($messageId == $notified[$count]['id']) {
@@ -1921,8 +1937,7 @@ class notification extends main
      * <h1>receive</h1>
      * <p>This is the method to display received notifications</p>
      */
-    public function receive()
-    {
+    public function receive() {
         $notified = $this->notified;
         if (count($notified) > 0) {
             $this->displayMessageTable(null, $notified, null);
@@ -1934,14 +1949,12 @@ class notification extends main
 }
 
 //the  sms class
-class sms extends main
-{
+class sms extends main {
 
     public $status = "";
 
     //sending the sms
-    public function send($recipient, $subject, $message)
-    {
+    public function send($recipient, $subject, $message) {
         $recipients = array();
         $file = null;
         $sent = 0;
@@ -1998,8 +2011,7 @@ class sms extends main
     }
 
     //sending message with the http API
-    private function serviceCaller($message, $phone, $sender)
-    {
+    private function serviceCaller($message, $phone, $sender) {
         $status = false;
         $send = new Sender("client.rmlconnect.net", "8080", "paradigm", "2hLn4PXn", $sender, $message, $phone, 0, 1);
         $response = $send->Submit();
@@ -2016,8 +2028,7 @@ class sms extends main
         return $status;
     }
 
-    public function history($user, $caller)
-    {
+    public function history($user, $caller) {
         $response = array();
         $response['response'] = array();
         try {
@@ -2061,8 +2072,7 @@ class sms extends main
     }
 
     //THE COUNTER FUNCTION
-    public function counter($criteria, $user)
-    {
+    public function counter($criteria, $user) {
         $number = 0;
         try {
             if ($criteria == "sent" && !isset($user)) {
@@ -2085,11 +2095,10 @@ class sms extends main
     }
 
     /*
-    CHECK IF STOCK EXISTS
+      CHECK IF STOCK EXISTS
      *      */
 
-    public function stockBalance($user)
-    {
+    public function stockBalance($user) {
         $response = array();
         try {
             $quantity = R::getCell("SELECT quantity FROM stock WHERE client='$user'");
@@ -2107,8 +2116,7 @@ class sms extends main
  * <h1>dashboard</h1>
  * <p>This class is to handle the dashboard of the application.</p>
  */
-class dashboard
-{
+class dashboard {
 
     /**
      * Setting the values in the dashboard
@@ -2116,8 +2124,7 @@ class dashboard
     public $title = [];
     public $number = [];
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->populate();
     }
 
@@ -2125,8 +2132,7 @@ class dashboard
      * <h1>populate</h1>
      * <p>Populating the values to be displayed in the dashboard</p>
      */
-    public function populate()
-    {
+    public function populate() {
         $userObj = new user();
         $messageObj = new message();
         $notificationObj = new notification();
@@ -2143,13 +2149,11 @@ class dashboard
             $this->number = $countList;
             $this->title = $titleList;
         }
-
     }
 
 }
 
-class web extends main
-{
+class web extends main {
 
     public $status = "";
 
@@ -2157,8 +2161,7 @@ class web extends main
      * <h1>showContent</h1>
      * <p>This method is to show the specified content of the web.</p>
      */
-    public function showContent($title, $formatType, $attributes)
-    {
+    public function showContent($title, $formatType, $attributes) {
         $subject = new subject();
         $format = new sectionFormat();
         if (isset($title) && isset($formatType) && isset($attributes)) {
@@ -2167,7 +2170,7 @@ class web extends main
                 $attributList[$count] = ["name" => $attributes[$count]];
             }
             $contentList = $this->fetchBuilder($title, $attributList);
-            for ($outer = 0;null!==$contentList && $outer < count($contentList); $outer++) {
+            for ($outer = 0; null !== $contentList && $outer < count($contentList); $outer++) {
                 $contentItem = $contentList[$outer];
                 switch ($formatType) {
                     case 1: //slide
@@ -2193,8 +2196,7 @@ class web extends main
 
 }
 
-class Sender
-{
+class Sender {
 
     public $host;
     public $port;
@@ -2237,8 +2239,7 @@ class Sender
      */
     public $strDlr;
 
-    private function sms__unicode($message)
-    {
+    private function sms__unicode($message) {
         $hex1 = '';
         if (function_exists('iconv')) {
             $latin = @iconv('UTF-8', 'ISO-8859-1', $message);
@@ -2270,8 +2271,7 @@ class Sender
     }
 
 //Constructor..
-    public function __construct($host, $port, $username, $password, $sender, $message, $mobile, $msgtype, $dlr)
-    {
+    public function __construct($host, $port, $username, $password, $sender, $message, $mobile, $msgtype, $dlr) {
         $this->host = $host;
         $this->port = $port;
         $this->strUserName = $username;
@@ -2283,15 +2283,14 @@ class Sender
         $this->strDlr = $dlr;
     }
 
-    private function send_hex()
-    {
+    private function send_hex() {
         $this->strMessage = $this->sms__unicode(
-            $this->strMessage);
+                $this->strMessage);
         try {
             //Smpp http Url to send sms.
             $live_url = "http://" . $this->host . ":" . $this->port . "/bulksms/bulksms?username=" . $this->strUserName .
-            "&password=" . $this->strPassword . "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" .
-            $this->strMobile . "&source=" . $this->strSender . "&message=" . $this->strMessage . "";
+                    "&password=" . $this->strPassword . "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" .
+                    $this->strMobile . "&source=" . $this->strSender . "&message=" . $this->strMessage . "";
             $parse_url = file($live_url);
             echo $parse_url[0];
         } catch (Exception $e) {
@@ -2300,15 +2299,14 @@ class Sender
     }
 
     //send sms with curl
-    private function send_sms_curl()
-    {
+    private function send_sms_curl() {
         $response = "";
         //Smpp http Url to send sms.
         $url = "http://" . $this->host . ":" .
-        $this->port . "/bulksms/bulksms?username=" . $this->strUserName . "&password=" . $this->strPassword .
-        "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" . $this->strMobile .
-        "&source=" . $this->strSender .
-        "&message=" . $this->strMessage . "";
+                $this->port . "/bulksms/bulksms?username=" . $this->strUserName . "&password=" . $this->strPassword .
+                "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" . $this->strMobile .
+                "&source=" . $this->strSender .
+                "&message=" . $this->strMessage . "";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -2327,16 +2325,15 @@ class Sender
     }
 
     //Sending the sms plain
-    private function send_sms()
-    {
+    private function send_sms() {
         $this->strMessage = urlencode($this->strMessage);
         try {
 //Smpp http Url to send sms.
             $live_url = "http://" . $this->host . ":" .
-            $this->port . "/bulksms/bulksms?username=" . $this->strUserName . "&password=" . $this->strPassword .
-            "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" . $this->strMobile .
-            "&source=" . $this->strSender .
-            "&message=" . $this->strMessage . "";
+                    $this->port . "/bulksms/bulksms?username=" . $this->strUserName . "&password=" . $this->strPassword .
+                    "&type=" . $this->strMessageType . "&dlr=" . $this->strDlr . "&destination=" . $this->strMobile .
+                    "&source=" . $this->strSender .
+                    "&message=" . $this->strMessage . "";
             $parse_url = file($live_url);
             $response = $parse_url[0];
         } catch (Exception $e) {
@@ -2345,11 +2342,10 @@ class Sender
         return $response;
     }
 
-    public function Submit()
-    {
+    public function Submit() {
         $response = "";
         if ($this->strMessageType == "2" ||
-            $this->strMessageType == "6") {
+                $this->strMessageType == "6") {
             //Call The Function Of String To HEX.
             $response = $this->send_hex();
         } else {
@@ -2359,11 +2355,12 @@ class Sender
     }
 
 }
+
 /*
  * Handling all upload process
  */
-class file_handler extends main
-{
+
+class file_handler extends main {
 
     public $status = "";
     public $fileId = "";
@@ -2375,16 +2372,15 @@ class file_handler extends main
      * @param $file the name of the image to be uploaded
      * @param $category The category in which the image can be described in
      */
-    public function upload($file)
-    {
-        $isUploaded=false;
+    public function upload($file) {
+        $isUploaded = false;
         //GETTING THE PARAMETERS TO READ
         //PHONE => DEFINE COLUMN TO READ
-        $db_file_name = basename($file['name']);        
+        $db_file_name = basename($file['name']);
         $ext = explode(".", $db_file_name);
         $fileExt = end($ext);
         if ($fileExt == "jpeg" || $fileExt == "png" || $fileExt == "jpg") {
-           $upload_errors = array(
+            $upload_errors = array(
                 // http://www.php.net/manual/en/features.file-upload.errors.php
 
                 UPLOAD_ERR_OK => "No errors.",
@@ -2402,7 +2398,7 @@ class file_handler extends main
                 error_log("ERROR(upload):No file was attached");
             } else if ($file["error"] != 0) {
                 $this->status = $this->feedbackFormat(0, $upload_errors[$file["error"]]);
-                error_log("ERROR(upload)".$upload_errors[$file["error"]]);
+                error_log("ERROR(upload)" . $upload_errors[$file["error"]]);
             } else if ($file["error"] == 0) {
                 $size = $file['size'];
                 $type = $file['type'];
@@ -2425,9 +2421,9 @@ class file_handler extends main
                         $fileDetails->added_by = $_SESSION['user_id'];
                         $fileDetails->status = false;
                         $fileId = R::store($fileDetails);
-                        if(isset($fileId)){
-                            error_log("file id".$fileId);
-                            $isUploaded=true;
+                        if (isset($fileId)) {
+                            error_log("file id" . $fileId);
+                            $isUploaded = true;
                         }
                         $this->filePath = "../images/uploaded/" . $taget_file;
                         $this->status = json_encode(array('id' => $fileId, 'type' => 'success', 'text' => "Upload successful", 'path' => $path));
@@ -2449,13 +2445,12 @@ class file_handler extends main
 
 }
 
-class validation extends main
-{
+class validation extends main {
+
     /**
      * Checking the uniqueness of the value to be entered.
      */
-    public function isUnique($tableName, $columnName, $value)
-    {
+    public function isUnique($tableName, $columnName, $value) {
         $isUnique = true;
         try {
             $tableList = $this->getTables(false);
@@ -2480,8 +2475,7 @@ class validation extends main
     /**
      * Checking if the email entered is valid.
      */
-    public function isValidEmail($email)
-    {
+    public function isValidEmail($email) {
         $isValid = true;
         if (null === $email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $isValid = false;
@@ -2489,16 +2483,16 @@ class validation extends main
         return $isValid;
     }
 
-    public function isActionValid($action)
-    {
+    public function isActionValid($action) {
         $user = new user();
         $isValid = false;
         //TODO: remove the delete_subject
-        if (!empty($action) && ($action == "Login" || $action == "sign_up") || $action == "delete_subject" || $action=="send_message") {
+        if (!empty($action) && ($action == "Login" || $action == "sign_up") || $action == "delete_subject" || $action == "send_message") {
             $isValid = true;
         } else if ($user->checkLogin()) {
             $isValid = true;
         }
         return $isValid;
     }
+
 }

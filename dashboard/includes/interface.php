@@ -47,7 +47,7 @@ switch ($action) {
             $valid = false;
         }
         if (empty($email)) {
-            $valid=false;
+            $valid = false;
             $user->status = $user->feedbackFormat(0, "Missing email!");
         } else {
             // check if e-mail is valid
@@ -56,8 +56,8 @@ switch ($action) {
                 $valid = false;
             }
         }
-        if($user->isUsernameValid($email)==false){
-            $valid=false;
+        if ($user->isUsernameValid($email) == false) {
+            $valid = false;
             $user->status = $user->feedbackFormat(0, "Email already registered");
         }
         if ($cpassword != $password) {
@@ -72,7 +72,7 @@ switch ($action) {
         //     $user->status = $user->feedbackFormat(0, "Unable to verify email");
         // }
 
-        if ($valid) {           
+        if ($valid) {
             $userType = $user->initialGrant($email, $password);
             $isCreated = $user->add($firstName, $lastName, "", $email, "", "", $email, $password, $userType);
             if ($isCreated == true) {
@@ -166,9 +166,14 @@ switch ($action) {
             $subject->status = $subject->feedbackFormat(0, "Fill all required fields!");
         }
         break;
-    case 'delete_subject':
-        $subjectTitle = $_REQUEST["subject_title"];
-        $subject->delete($subjectTitle);
+    case 'delete_instance':
+        $contentName = str_replace(" ", "_", $_REQUEST['content']);
+        $instanceId = $_REQUEST['instance_id'];
+        if ($contentName == "subject") {
+            $subject->delete($instanceId);
+        } else {
+            $content->delete($contentName, $instanceId);
+        }
         break;
     case 'save':
         $isDataValid = true;
@@ -184,12 +189,12 @@ switch ($action) {
                 $uniqueProperty = $attributes[$count]['is_unique'];
                 if ($attributes[$count]['type'] == "file") {
                     $file = $_FILES[$attributes[$count]['name']];
-                    $isUploaded=$fileHandler->upload($file);
-                    if($isUploaded!=true){
+                    $isUploaded = $fileHandler->upload($file);
+                    if ($isUploaded != true) {
                         die($fileHandler->status);
-                    }else{
+                    } else {
                         $values[$count] = $fileHandler->filePath;
-                    }                    
+                    }
                 } else {
                     $values[$count] = $_REQUEST[$attributes[$count]['name']];
                 }
@@ -201,10 +206,50 @@ switch ($action) {
                     $isDataValid = false;
                     $main->status = $main->feedbackFormat(0, $attributeName . " must be unique, and " . $_REQUEST[$attributes[$count]['name']] . " is already saved");
                     die($main->status);
-                } 
+                }
             }
             if ($isDataValid == true) {
                 $main->status = $content->add($main->header($articleId), $values, $attributes);
+            }
+        } else {
+            $main->status = $main->feedbackFormat(0, "ERROR: Form data not fetched!");
+        }
+        die($main->status);
+        break;
+    case 'update':
+        $isDataValid = true;
+        $validationError = "";
+        $values = array();
+        $subjectTitle = $_REQUEST['subject_title'];
+        $occurenceId = $_REQUEST['occurence_id'];
+        $subjectId = $subject->getId($subjectTitle);
+        $attributes = $subject->getAttributes($subjectId);
+        if (count($attributes) > 0) {
+            //getting form values
+            for ($count = 0; $count < count($attributes); $count++) {
+                $attributeName = str_replace("_", " ", $attributes[$count]['name']);
+                $nullProperty = $attributes[$count]['is_null'];
+                $uniqueProperty = $attributes[$count]['is_unique'];
+                if ($nullProperty == "false" && empty($_REQUEST[$attributes[$count]['name']])) {
+                    $isDataValid = false;
+                    $main->status = $main->feedbackFormat(0, $attributeName . " is required");
+                    die($main->status);
+                } else if ($uniqueProperty == "true" && $validation->isUnique($main->header($subjectId), $attributes[$count]['name'], $_REQUEST[$attributes[$count]['name']]) != true) {
+                    $isDataValid = false;
+                    $main->status = $main->feedbackFormat(0, $attributeName . " must be unique, and " . $_REQUEST[$attributes[$count]['name']] . " is already saved");
+                    die($main->status);
+                } else {
+                    if ($attributes[$count]['type'] == "file" && null !== $_FILES[$attributes[$count]['name']]) {
+                        $file = $_FILES[$attributes[$count]['name']];
+                        $fileHandler->upload($file);
+                        $values[$count] = $fileHandler->filePath;
+                    } else {
+                        $values[$count] = $_REQUEST[$attributes[$count]['name']];
+                    }
+                }
+            }
+            if ($isDataValid == true) {
+                $main->status = $content->update($occurenceId, $main->header($subjectId), $values, $attributes);
             }
         } else {
             $main->status = $main->feedbackFormat(0, "ERROR: Form data not fetched!");
