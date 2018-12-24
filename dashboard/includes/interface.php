@@ -1,7 +1,8 @@
 <?php
 
-//Interface
+// Interface
 require 'classes.php';
+require 'bookingHelper.php';
 $user = new user();
 $subject = new subject();
 $content = new content();
@@ -13,25 +14,25 @@ $smsKey = new sms();
 $fileHandler = new file_handler();
 $validation = new validation();
 $action = null;
-//getting caller details
+// getting caller details
 if (isset($_REQUEST['action'])) {
     $action = $_REQUEST['action'];
-    if (!$validation->isActionValid($action)) {
+    if (! $validation->isActionValid($action)) {
         error_log("ERROR: unable to validate action ($action)");
         $notification->status = $notification->feedbackFormat(0, "Error occured");
         die($notification->status);
     }
 }
 switch ($action) {
-    //admin functionalities
+    // admin functionalities
     case 'Login':
-        //getting the required values to log in
+        // getting the required values to log in
         $username = $_REQUEST['log_username'];
         $password = $_REQUEST['log_password'];
         $user->login($username, $password);
         break;
     case 'Unlock':
-        //getting the required values to log in
+        // getting the required values to log in
         $password = $_REQUEST['password'];
         $response = $user->login($_SESSION['username'], $password);
         break;
@@ -51,7 +52,7 @@ switch ($action) {
             $user->status = $user->feedbackFormat(0, "Missing email!");
         } else {
             // check if e-mail is valid
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $user->status = $user->feedbackFormat(0, "Invalid email format");
                 $valid = false;
             }
@@ -68,8 +69,8 @@ switch ($action) {
          * XXX: Uncomment the if below to send email verification.
          */
         // if($message->sendEmail($email)==false){
-        //     $valid = false;
-        //     $user->status = $user->feedbackFormat(0, "Unable to verify email");
+        // $valid = false;
+        // $user->status = $user->feedbackFormat(0, "Unable to verify email");
         // }
 
         if ($valid) {
@@ -122,9 +123,9 @@ switch ($action) {
         $attrNumber = $_REQUEST['subject_count_attr'];
         $attrString = "";
         if (isset($title) && isset($attrNumber) && isset($_REQUEST['attr_name0']) && $type !== 0) {
-            //looping throughout the attributes
+            // looping throughout the attributes
             $attributes = array();
-            for ($count = 0; $count < $attrNumber; $count++) {
+            for ($count = 0; $count < $attrNumber; $count ++) {
                 $attrName = $_REQUEST['attr_name' . $count];
                 $attrType = $_REQUEST['attr_type' . $count];
                 $attrNullable = $_REQUEST['attr_nullable' . $count];
@@ -137,8 +138,9 @@ switch ($action) {
                         'is_null' => $attrNullable,
                         'is_unique' => $attrUniqueness,
                         'has_ref' => false,
-                        'reference' => null);
-                } else if (!$subject->isDataTypeDefault($attrType) && !$subject->isDataTypeTable($attrType)) {
+                        'reference' => null
+                    );
+                } else if (! $subject->isDataTypeDefault($attrType) && ! $subject->isDataTypeTable($attrType)) {
                     $attrDetails = explode("|", $attrType);
                     if (isset($attrDetails[0]) && isset($attrDetails[1]) && $subject->isDataTypeTable($attrDetails[0]) && $subject->isDataTypeColumn($attrDetails[1])) {
                         $attribute_desc = array(
@@ -147,7 +149,8 @@ switch ($action) {
                             'is_null' => $attrNullable,
                             'is_unique' => $attrUniqueness,
                             'has_ref' => true,
-                            'reference' => $attrDetails[1]);
+                            'reference' => $attrDetails[1]
+                        );
                     } else {
                         $subject->status = $subject->feedbackFormat(0, "ERROR: Failure to read data types");
                         return;
@@ -179,15 +182,21 @@ switch ($action) {
         $isDataValid = true;
         $validationError = "";
         $values = array();
-        $articleId = $_REQUEST['data-set'];
+        $articleId = is_numeric($_REQUEST['data-set']) ? $_REQUEST['data-set'] : $subject->getId($_REQUEST['data-set']);
         $attributes = $subject->getAttributes($articleId);
         if (count($attributes) > 0) {
-            //getting form values
-            for ($count = 0; $count < count($attributes); $count++) {
+            // getting form values
+            for ($count = 0; $count < count($attributes); $count ++) {
                 $attributeName = str_replace("_", " ", $attributes[$count]['name']);
                 $nullProperty = $attributes[$count]['is_null'];
                 $uniqueProperty = $attributes[$count]['is_unique'];
-                if ($attributes[$count]['type'] == "file") {
+
+                if ($attributes[$count]['type'] == "cloud") {
+                    $incomingValue = explode("dev/safaris-images", $_REQUEST[$attributes[$count]['name']]);
+                    $decodedValue = str_replace("/", "%2F", $incomingValue[1]);
+                    $valueToSave = $incomingValue[0] . "dev%2Fsafaris-images" . $decodedValue;
+                    $values[$count] = $valueToSave;
+                } else if ($attributes[$count]['type'] == "file") {
                     $file = $_FILES[$attributes[$count]['name']];
                     $isUploaded = $fileHandler->upload($file);
                     if ($isUploaded != true) {
@@ -209,6 +218,11 @@ switch ($action) {
                 }
             }
             if ($isDataValid == true) {
+                // sending SMS if it is booking
+                if ('booking' == $main->header($articleId)) {
+                    $bookingHelper = new EXBookingHelper();
+                    $bookingHelper->notifyWithSMS($_REQUEST);
+                }
                 $main->status = $content->add($main->header($articleId), $values, $attributes);
             }
         } else {
@@ -225,8 +239,8 @@ switch ($action) {
         $subjectId = $subject->getId($subjectTitle);
         $attributes = $subject->getAttributes($subjectId);
         if (count($attributes) > 0) {
-            //getting form values
-            for ($count = 0; $count < count($attributes); $count++) {
+            // getting form values
+            for ($count = 0; $count < count($attributes); $count ++) {
                 $attributeName = str_replace("_", " ", $attributes[$count]['name']);
                 $nullProperty = $attributes[$count]['is_null'];
                 $uniqueProperty = $attributes[$count]['is_unique'];
@@ -256,13 +270,24 @@ switch ($action) {
         $messageTXT = $_REQUEST['message'];
         $message->send($sender, $email, $messageTXT);
         break;
+    case 'send_review':
+        // TODO: Need to review this condition and improve upon it.
+        if (null !== $_POST['reiviewer_email']) {
+            error_log("ERROR(interface:): Missing email");
+        }
+        $name = $_REQUEST['reiviewer_name'];
+        $email = $_REQUEST['reiviewer_email'];
+        $entityName = is_numeric($_POST['data-set']) ? $_POST['data-set'] : $entity->getId($_POST['data-set']);
+        $occurenceId = $_POST["occurence_id"];
+
+        break;
     case 'Send':
         $recipient = $_REQUEST['send_sms_recipient'];
         $subject = $_REQUEST['send_sms_subject'];
         $messageTXT = $_REQUEST['send_sms_message'];
         $smsKey->send($recipient, $subject, $messageTXT);
         break;
-    //UI callers
+    // UI callers
     case 'combo_tables':
         $main->getTables(true);
         break;
@@ -296,7 +321,10 @@ switch ($action) {
                 $attributeList = $subject->getAttributes($articleId);
             }
             if (count($attributeList) > 0) {
-                $main->status = json_encode(array('type' => 'success', 'attributes' => $attributeList));
+                $main->status = json_encode(array(
+                    'type' => 'success',
+                    'attributes' => $attributeList
+                ));
             } else {
                 $main->status = $main->feedbackFormat(0, "Unable to get attributes");
             }

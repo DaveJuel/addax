@@ -118,7 +118,9 @@ include "../content/modular.php";
         <script src="../js/pages/dashboard.js"></script>
         <script src="../js/main.js"></script>
         <script src="../js/pages/table-data.js"></script>
-        <script src="../plugins/datatables/js/jquery.datatables.min.js"></script>        
+        <script src="../plugins/datatables/js/jquery.datatables.min.js"></script>    
+        <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
+         <script src="../js/firebase-config.js"></script>    
         <script src="../js/interface.js"></script>       
         <script type="text/javascript" src="../../js/tawkChat.js"></script>
     </body>

@@ -1,7 +1,7 @@
 <?php
 require '../includes/interface.php';
  ?>
-<?php $title=$main->header($_REQUEST['article']);  ?>
+<?php $title=str_replace("_", " ", $main->header($_REQUEST['article'])) ;  ?>
 <?php ob_start(); ?>
 <?php
 $formType = $subject->getSubjectType($_REQUEST['article']);
