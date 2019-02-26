@@ -19,7 +19,7 @@ ob_start();
         <div class="main_title mt_wave a_center">
             <h2>OUR AWESOME FEATURES</h2>
         </div>
-        <p class="main_description a_center">We make your website awesome.</p>
+        <p class="main_description a_center">What <b>Addax</b> gives you.</p>
         <div class="row">
           <?php $web->showContent("feature",2,["name","description","image"]); ?>
         </div>
