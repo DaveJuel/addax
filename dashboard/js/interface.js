@@ -40,13 +40,13 @@ $("#login-form").on('submit', function (e) {
     var output;
     post_data = {
         'action': "Login",
-        'log_username': username,
-        'log_password': password
+        'username': username,
+        'password': password
     };
     output = '<div class="alert alert-info"><span class="notification-icon"><i class="glyphicon glyphicon-repeat fast-right-spinner" aria-hidden="true"></i></span><span class="notification-text">Logging in...</span></div>';
     $("#notification").html(output);   
     //Ajax post data to server
-    $.post('../includes/interface.php', post_data, function (response) {
+    $.post('https://addax-api.herokuapp.com/user/login', post_data, function (response) {
         //Response server message
         if (response.type == 'error') {
             output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.text + '</span></div>';
