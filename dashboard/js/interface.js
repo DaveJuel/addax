@@ -39,7 +39,6 @@ $("#login-form").on('submit', function (e) {
     var post_data;
     var output;
     post_data = {
-        'action': "Login",
         'username': username,
         'password': password
     };
@@ -48,12 +47,15 @@ $("#login-form").on('submit', function (e) {
     //Ajax post data to server
     $.post('https://addax-api.herokuapp.com/user/login', post_data, function (response) {
         //Response server message
-        if (response.type == 'error') {
-            output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.text + '</span></div>';
-        } else if (response.type == "success") {
+        if (response.status == 'error') {
+            output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.error_message + '</span></div>';
+        } else if (response.status == "success") {
             window.location.href = "home.php";
-        } else {
-            output = '<div class="alert alert-warning"><span class="notification-icon"><i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.text + '</span></div>';
+        } else if (response.status == "failed") {
+            output = '<div class="alert alert-danger"><span class="notification-icon"><i class="glyphicon glyphicon-warning-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.error_message + '</span></div>';
+            
+        }else {
+            output = '<div class="alert alert-warning"><span class="notification-icon"><i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i></span><span class="notification-text"> ' + response.error_message + '</span></div>';
             //If success clear inputs
             $("input, textarea").val('');
             $('select').val('');
