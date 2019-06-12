@@ -2229,7 +2229,7 @@ class sms extends main
                 error_log($e);
             }
         } else {
-            $recipients = explode(";", $recipient);
+            $recipients = explode(";", str_replace(" ", "", $recipient));
         }
         // sending messages
         for ($counter = 0; $counter < count($recipients); $counter ++) {
