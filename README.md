@@ -1,3 +1,4 @@
+(DEPRECATED)
 # README #
 
 This file is to instruct you installing and successfully running Addax.
